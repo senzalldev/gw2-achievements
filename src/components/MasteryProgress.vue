@@ -28,6 +28,16 @@
         </div>
       </div>
 
+      <!-- Collapse all -->
+      <div v-if="expanded.size > 0" class="flex justify-end mb-2">
+        <button
+          @click="expanded = new Set()"
+          class="text-xs text-slate-500 hover:text-slate-300 transition-colors"
+        >
+          Collapse all
+        </button>
+      </div>
+
       <!-- Per-region mastery tracks -->
       <div v-for="region in groupedMasteries" :key="region.name" class="mb-6">
         <h4 class="text-sm font-semibold text-amber-400 mb-3 flex items-center gap-2">

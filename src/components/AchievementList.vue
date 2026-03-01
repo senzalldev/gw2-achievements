@@ -65,9 +65,16 @@
       </select>
     </div>
 
-    <!-- Count -->
-    <div class="text-xs text-slate-500 mb-3">
-      Showing {{ visible.length }} of {{ filtered.length }} achievements
+    <!-- Count + collapse all -->
+    <div class="flex items-center justify-between mb-3">
+      <div class="text-xs text-slate-500">Showing {{ visible.length }} of {{ filtered.length }} achievements</div>
+      <button
+        v-if="expanded.size > 0"
+        @click="expanded = new Set()"
+        class="text-xs text-slate-500 hover:text-slate-300 transition-colors"
+      >
+        Collapse all
+      </button>
     </div>
 
     <!-- List -->
@@ -173,7 +180,7 @@
               <h4 class="text-sm font-semibold text-amber-400">
                 Still to do
                 <span class="text-slate-500 font-normal text-xs ml-1">
-                  ({{ remainingBitsFor(item).length }} of {{ item.detail.bits.length }} tasks left)
+                  ({{ remainingBitsFor(item).length }} of {{ displayableBitCount(item) }} tasks left)
                 </span>
               </h4>
               <button
@@ -315,20 +322,29 @@ function wikiUrl(name: string): string {
   return `https://wiki.guildwars2.com/wiki/${encodeURIComponent(name.replace(/ /g, '_'))}`
 }
 
+function isDisplayableBit(bit: AchievementBit): boolean {
+  if (bit.type === 'Text') return !!bit.text?.trim()
+  return bit.id != null
+}
+
 function remainingBitsFor(item: EnrichedAchievement): AchievementBit[] {
   if (!item.detail.bits) return []
   const doneBitIndices = new Set(item.account.bits ?? [])
-  return item.detail.bits.filter((_, idx) => !doneBitIndices.has(idx))
+  return item.detail.bits.filter((bit, idx) => !doneBitIndices.has(idx) && isDisplayableBit(bit))
 }
 
 function doneBitsFor(item: EnrichedAchievement): AchievementBit[] {
   if (!item.detail.bits) return []
   const doneBitIndices = new Set(item.account.bits ?? [])
-  return item.detail.bits.filter((_, idx) => doneBitIndices.has(idx))
+  return item.detail.bits.filter((bit, idx) => doneBitIndices.has(idx) && isDisplayableBit(bit))
+}
+
+function displayableBitCount(item: EnrichedAchievement): number {
+  return item.detail.bits?.filter(isDisplayableBit).length ?? 0
 }
 
 function getBitName(bit: AchievementBit): string {
-  if (bit.type === 'Text') return bit.text ?? 'Unknown task'
+  if (bit.type === 'Text') return bit.text!.trim()
   if (bit.id != null) {
     const cacheKey = `${bit.type.toLowerCase()}:${bit.id}`
     return props.bitNamesCache.get(cacheKey) ?? `${bit.type} #${bit.id}`

@@ -10,15 +10,21 @@
     </div>
 
     <template v-else>
-      <VaultSection v-if="daily"   key="daily"   title="Daily"   reset-label="Resets at 00:00 UTC"            :section="daily" />
-      <VaultSection v-if="weekly"  key="weekly"  title="Weekly"  reset-label="Resets Monday at 07:30 UTC"     :section="weekly" />
-      <VaultSection v-if="special" key="special" title="Special" reset-label="Limited-time objectives"        :section="special" />
+      <div class="flex justify-end">
+        <button
+          @click="collapseAll++"
+          class="text-xs text-slate-500 hover:text-slate-300 transition-colors"
+        >Collapse all</button>
+      </div>
+      <VaultSection v-if="daily"   key="daily"   title="Daily"   reset-label="Resets at 00:00 UTC"            :section="daily"   :collapse-signal="collapseAll" />
+      <VaultSection v-if="weekly"  key="weekly"  title="Weekly"  reset-label="Resets Monday at 07:30 UTC"     :section="weekly"  :collapse-signal="collapseAll" />
+      <VaultSection v-if="special" key="special" title="Special" reset-label="Limited-time objectives"        :section="special" :collapse-signal="collapseAll" />
     </template>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, defineComponent, h, computed } from 'vue'
+import { ref, onMounted, defineComponent, h, computed, watch } from 'vue'
 import { getWizardsVaultDaily, getWizardsVaultWeekly, getWizardsVaultSpecial } from '../api/gw2'
 import type { WizardsVaultSection, WizardsVaultObjective } from '../types/gw2'
 
@@ -30,9 +36,11 @@ const VaultSection = defineComponent({
     title: { type: String, required: true },
     resetLabel: { type: String, required: true },
     section: { type: Object as () => WizardsVaultSection, required: true },
+    collapseSignal: { type: Number, default: 0 },
   },
   setup(props) {
     const expanded = ref(true)
+    watch(() => props.collapseSignal, () => { expanded.value = false })
 
     const done = computed(() =>
       props.section.objectives.filter(o => o.claimed || o.progress_current >= o.progress_complete).length
@@ -159,6 +167,7 @@ const error = ref('')
 const daily = ref<WizardsVaultSection | null>(null)
 const weekly = ref<WizardsVaultSection | null>(null)
 const special = ref<WizardsVaultSection | null>(null)
+const collapseAll = ref(0)
 
 onMounted(async () => {
   const results = await Promise.allSettled([
