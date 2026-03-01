@@ -72,8 +72,45 @@
           />
           <CategoryPointsChart :category-stats="categoryStats" />
         </div>
-        <AlmostDone :items="almostDone" @select="jumpToAchievement" />
-        <MostValuable :items="mostValuable" @select="jumpToAchievement" />
+        <!-- Quick-access cards for Almost Done and Most Valuable -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <button
+            @click="activeTab = 'almostdone'"
+            class="bg-slate-800 border border-slate-700 rounded-xl p-5 text-left hover:border-amber-400/40 transition-colors group"
+          >
+            <div class="text-2xl mb-2">🏃</div>
+            <div class="font-semibold text-white group-hover:text-amber-300 transition-colors">Almost Done</div>
+            <div class="text-xs text-slate-400 mt-1">{{ almostDone.length }} achievements near completion</div>
+          </button>
+          <button
+            @click="activeTab = 'mostvaluable'"
+            class="bg-slate-800 border border-slate-700 rounded-xl p-5 text-left hover:border-purple-400/40 transition-colors group"
+          >
+            <div class="text-2xl mb-2">💎</div>
+            <div class="font-semibold text-white group-hover:text-purple-300 transition-colors">Most Valuable</div>
+            <div class="text-xs text-slate-400 mt-1">{{ mostValuable.length }} achievements with the most AP left</div>
+          </button>
+        </div>
+      </template>
+
+      <!-- Almost Done tab -->
+      <template v-if="activeTab === 'almostdone'">
+        <AlmostDone
+          :items="almostDone"
+          :bit-names-cache="bitNamesCache"
+          :resolve-bit-names="resolveBitNames"
+          @select="jumpToAchievement"
+        />
+      </template>
+
+      <!-- Most Valuable tab -->
+      <template v-if="activeTab === 'mostvaluable'">
+        <MostValuable
+          :items="mostValuable"
+          :bit-names-cache="bitNamesCache"
+          :resolve-bit-names="resolveBitNames"
+          @select="jumpToAchievement"
+        />
       </template>
 
       <!-- Categories tab -->
@@ -167,7 +204,7 @@ const {
 
 const allCategories = computed(() => categoryStats.value.map(cs => cs.category))
 
-const activeTab = ref<'overview' | 'categories' | 'browse' | 'daily' | 'masteries'>('overview')
+const activeTab = ref<'overview' | 'almostdone' | 'mostvaluable' | 'categories' | 'browse' | 'daily' | 'masteries'>('overview')
 const presetCategory = ref<number | ''>('')
 const presetSearch = ref('')
 const categorySearch = ref('')
@@ -180,6 +217,8 @@ const filteredCategoryStats = computed(() => {
 
 const tabs = [
   { id: 'overview' as const, label: 'Overview' },
+  { id: 'almostdone' as const, label: 'Almost Done' },
+  { id: 'mostvaluable' as const, label: 'Most Valuable' },
   { id: 'categories' as const, label: 'Categories' },
   { id: 'browse' as const, label: 'Browse All' },
   { id: 'daily' as const, label: 'Daily' },
