@@ -101,3 +101,8 @@ export interface MasteryPoints {
   totals: { region: string; spent: number; earned: number }[]
   unlocked: number
 }
+
+export interface SavedAccount {
+  key: string
+  accountName: string
+}

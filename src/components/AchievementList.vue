@@ -86,7 +86,8 @@
         <button
           v-if="isFiltered"
           @click="clearFilters"
-          class="text-xs text-amber-400 hover:text-amber-300 transition-colors"
+          class="flex items-center gap-1 text-xs bg-amber-500/20 hover:bg-amber-500/30
+                 text-amber-400 border border-amber-500/40 px-2.5 py-1 rounded-full transition-colors"
         >
           ✕ Clear filters
         </button>

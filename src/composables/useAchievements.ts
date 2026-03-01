@@ -1,6 +1,6 @@
 import { ref, reactive, computed } from 'vue'
 import { validateKey, getAccountAchievements, getAchievementCategories, getAchievementGroups, getAchievementDetails, resolveItems, resolveSkins, resolveMinis } from '../api/gw2'
-import type { AccountInfo, AccountAchievement, AchievementCategory, AchievementGroup, AchievementDetail, AchievementBit } from '../types/gw2'
+import type { AccountInfo, AccountAchievement, AchievementCategory, AchievementGroup, AchievementDetail, AchievementBit, SavedAccount } from '../types/gw2'
 
 export interface EnrichedAchievement {
   account: AccountAchievement
@@ -77,12 +77,34 @@ async function resolveBitNames(bits: AchievementBit[]): Promise<void> {
   }
 }
 
+function loadSavedAccounts(): SavedAccount[] {
+  try { return JSON.parse(localStorage.getItem('gw2_accounts') ?? '[]') }
+  catch { return [] }
+}
+
 export function useAchievements() {
   const accountInfo = ref<AccountInfo | null>(null)
   const loading = ref(false)
   const error = ref('')
   const loadingStage = ref('')
-  const savedKey = ref(localStorage.getItem('gw2_api_key') ?? '')
+
+  const savedAccounts = ref<SavedAccount[]>(loadSavedAccounts())
+
+  function persistAccounts() {
+    localStorage.setItem('gw2_accounts', JSON.stringify(savedAccounts.value))
+  }
+
+  // Migrate from old single-key storage
+  if (!localStorage.getItem('gw2_accounts') && localStorage.getItem('gw2_api_key')) {
+    const oldKey = localStorage.getItem('gw2_api_key')!
+    savedAccounts.value = [{ key: oldKey, accountName: '' }]
+    persistAccounts()
+    localStorage.removeItem('gw2_api_key')
+  }
+
+  const savedKey = ref(
+    localStorage.getItem('gw2_last_key') ?? savedAccounts.value[0]?.key ?? ''
+  )
 
   const accountAchievements = ref<AccountAchievement[]>([])
   const categories = ref<AchievementCategory[]>([])
@@ -186,8 +208,12 @@ export function useAchievements() {
       loadingStage.value = "Checking your tracker key..."
       accountInfo.value = await validateKey(key)
 
-      // Persist the validated key
-      localStorage.setItem('gw2_api_key', key)
+      // Upsert into saved accounts
+      const idx = savedAccounts.value.findIndex(a => a.key === key)
+      if (idx >= 0) savedAccounts.value[idx].accountName = accountInfo.value.name
+      else savedAccounts.value.push({ key, accountName: accountInfo.value.name })
+      persistAccounts()
+      localStorage.setItem('gw2_last_key', key)
       savedKey.value = key
 
       loadingStage.value = "Fetching your hero's journey..."
@@ -216,12 +242,19 @@ export function useAchievements() {
     categories.value = []
     detailsMap.value = new Map()
     error.value = ''
-    localStorage.removeItem('gw2_api_key')
+    localStorage.removeItem('gw2_last_key')
     savedKey.value = ''
+  }
+
+  function removeAccount(key: string) {
+    savedAccounts.value = savedAccounts.value.filter(a => a.key !== key)
+    persistAccounts()
+    if (savedKey.value === key) reset()
   }
 
   return {
     accountInfo, loading, error, loadingStage, savedKey,
+    savedAccounts, removeAccount,
     bitNamesCache, resolveBitNames,
     enrichedAchievements, stats, categoryStats, almostDone, incomplete, mostValuable,
     categoryToGroup, sortedGroups,

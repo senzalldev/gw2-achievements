@@ -8,7 +8,6 @@
     <div class="flex justify-center gap-4 mt-3 text-xs text-slate-400">
       <span class="flex items-center gap-1"><span class="w-3 h-3 rounded-full bg-emerald-500 inline-block"></span> Done</span>
       <span class="flex items-center gap-1"><span class="w-3 h-3 rounded-full bg-amber-400 inline-block"></span> In Progress</span>
-      <span class="flex items-center gap-1"><span class="w-3 h-3 rounded-full bg-slate-500 inline-block"></span> Not Started</span>
     </div>
   </div>
 </template>
@@ -24,18 +23,17 @@ ChartJS.register(ArcElement, Tooltip, Legend)
 const props = defineProps<{
   done: number
   inProgress: number
-  notStarted: number
 }>()
 
-const emit = defineEmits<{ select: [status: 'done' | 'inprogress' | 'notstarted'] }>()
+const emit = defineEmits<{ select: [status: 'done' | 'inprogress'] }>()
 
-const statusMap = ['done', 'inprogress', 'notstarted'] as const
+const statusMap = ['done', 'inprogress'] as const
 
 const chartData = computed(() => ({
-  labels: ['Completed', 'In Progress', 'Not Started'],
+  labels: ['Completed', 'In Progress'],
   datasets: [{
-    data: [props.done, props.inProgress, props.notStarted],
-    backgroundColor: ['#10b981', '#f59e0b', '#64748b'],
+    data: [props.done, props.inProgress],
+    backgroundColor: ['#10b981', '#f59e0b'],
     borderColor: ['#0f172a'],
     borderWidth: 2,
   }],

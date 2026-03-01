@@ -10,48 +10,94 @@
 
       <!-- Card -->
       <div class="bg-slate-800 rounded-2xl p-8 shadow-2xl border border-slate-700">
-        <h2 class="text-lg font-semibold text-white mb-1">Enter your tracker key</h2>
-        <p class="text-sm text-slate-400 mb-5">
-          Generate a personal tracker key at
-          <a href="https://account.arena.net/applications" target="_blank" rel="noopener"
-             class="text-amber-400 hover:text-amber-300 underline">account.arena.net</a>.
-          Name it anything and enable the <strong class="text-white">Progression</strong> permission.
-        </p>
 
-        <!-- Remembered key notice -->
-        <div v-if="savedKey && !clearedKey" class="mb-4 flex items-center justify-between bg-slate-700/50 border border-slate-600 rounded-lg px-3 py-2">
-          <span class="text-xs text-slate-400">Key remembered from your last visit</span>
+        <!-- Saved accounts view -->
+        <template v-if="!showAddForm && props.savedAccounts.length > 0">
+          <h2 class="text-lg font-semibold text-white mb-1">Your accounts</h2>
+          <p class="text-sm text-slate-400 mb-5">Select an account to load, or add a new one.</p>
+
+          <div class="space-y-2 mb-5">
+            <div
+              v-for="acct in props.savedAccounts"
+              :key="acct.key"
+              class="flex items-center gap-2 bg-slate-700/50 border border-slate-600 rounded-lg px-3 py-2.5"
+            >
+              <div class="flex-1 min-w-0">
+                <div class="text-sm font-medium text-white truncate">
+                  {{ acct.accountName || '…' }}
+                </div>
+                <div class="text-xs text-slate-500 font-mono truncate">{{ acct.key.slice(0, 8) }}…</div>
+              </div>
+              <button
+                type="button"
+                @click="emit('submit', acct.key)"
+                :disabled="loading"
+                class="shrink-0 bg-amber-500 hover:bg-amber-400 disabled:opacity-40 disabled:cursor-not-allowed
+                       text-slate-900 font-bold text-sm px-3 py-1.5 rounded-lg transition-colors"
+              >
+                {{ loading ? '…' : 'Connect' }}
+              </button>
+              <button
+                type="button"
+                @click="emit('remove', acct.key)"
+                class="shrink-0 text-slate-500 hover:text-red-400 transition-colors text-lg leading-none px-1"
+                title="Remove account"
+              >×</button>
+            </div>
+          </div>
+
           <button
             type="button"
-            @click="clearKey"
-            class="text-xs text-slate-500 hover:text-slate-300 transition-colors"
+            @click="showAddForm = true"
+            class="w-full border border-dashed border-slate-600 hover:border-amber-400/50 text-slate-400
+                   hover:text-amber-400 rounded-lg py-2.5 text-sm transition-colors"
           >
-            Use a different key
+            + Add Account
           </button>
-        </div>
+        </template>
 
-        <form @submit.prevent="submit">
-          <input
-            v-model="key"
-            type="text"
-            placeholder="XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXXXXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX"
-            class="w-full bg-slate-900 border border-slate-600 text-white rounded-lg px-4 py-3 text-sm font-mono
-                   placeholder-slate-600 focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400
-                   transition mb-4"
-            :disabled="loading"
-            spellcheck="false"
-            autocomplete="off"
-          />
+        <!-- Key input form -->
+        <template v-else>
+          <h2 class="text-lg font-semibold text-white mb-1">Enter your tracker key</h2>
+          <p class="text-sm text-slate-400 mb-5">
+            Generate a personal tracker key at
+            <a href="https://account.arena.net/applications" target="_blank" rel="noopener"
+               class="text-amber-400 hover:text-amber-300 underline">account.arena.net</a>.
+            Name it anything and enable the <strong class="text-white">Progression</strong> permission.
+          </p>
+
+          <form @submit.prevent="submit">
+            <input
+              v-model="key"
+              type="text"
+              placeholder="XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXXXXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX"
+              class="w-full bg-slate-900 border border-slate-600 text-white rounded-lg px-4 py-3 text-sm font-mono
+                     placeholder-slate-600 focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400
+                     transition mb-4"
+              :disabled="loading"
+              spellcheck="false"
+              autocomplete="off"
+            />
+
+            <button
+              type="submit"
+              :disabled="!key.trim() || loading"
+              class="w-full bg-amber-500 hover:bg-amber-400 disabled:opacity-40 disabled:cursor-not-allowed
+                     text-slate-900 font-bold py-3 rounded-lg transition-colors"
+            >
+              {{ loading ? loadingStage : 'Load My Achievements' }}
+            </button>
+          </form>
 
           <button
-            type="submit"
-            :disabled="!key.trim() || loading"
-            class="w-full bg-amber-500 hover:bg-amber-400 disabled:opacity-40 disabled:cursor-not-allowed
-                   text-slate-900 font-bold py-3 rounded-lg transition-colors"
+            v-if="props.savedAccounts.length > 0"
+            type="button"
+            @click="showAddForm = false"
+            class="mt-3 text-xs text-slate-500 hover:text-slate-300 transition-colors"
           >
-            {{ loading ? loadingStage : 'Load My Achievements' }}
+            ← Back to saved accounts
           </button>
-        </form>
+        </template>
 
         <div v-if="error" class="mt-4 p-3 bg-red-900/40 border border-red-700 rounded-lg text-red-300 text-sm">
           {{ error }}
@@ -85,6 +131,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
+import type { SavedAccount } from '../types/gw2'
 
 const features = [
   { icon: '📊', label: 'Overview',      desc: 'AP progress charts & category breakdown' },
@@ -99,20 +146,16 @@ const props = defineProps<{
   loading: boolean
   loadingStage: string
   error: string
-  savedKey?: string
+  savedAccounts?: SavedAccount[]
 }>()
 
 const emit = defineEmits<{
   submit: [key: string]
+  remove: [key: string]
 }>()
 
-const key = ref(props.savedKey ?? '')
-const clearedKey = ref(false)
-
-function clearKey() {
-  key.value = ''
-  clearedKey.value = true
-}
+const showAddForm = ref((props.savedAccounts?.length ?? 0) === 0)
+const key = ref('')
 
 function submit() {
   if (key.value.trim()) emit('submit', key.value.trim())
