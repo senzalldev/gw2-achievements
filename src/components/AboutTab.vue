@@ -151,6 +151,30 @@
       </ul>
     </div>
 
+    <!-- Buy Me a Coffee -->
+    <div class="bg-slate-800 rounded-xl border border-slate-700 p-5">
+      <h3 class="font-semibold text-white mb-3 flex items-center gap-2">
+        <span>☕</span> Support
+      </h3>
+      <p class="text-sm text-slate-400 leading-relaxed mb-4">
+        No gems, no paywall — just tools built by a fellow player. If this tracker has helped you chip
+        away at that achievement backlog, or
+        <a href="https://senzall.com/ltmessages" target="senzall" rel="noopener"
+           class="text-amber-400 hover:text-amber-300 transition-colors">LT Messages</a>
+        has made your squad comms a little smoother,
+        buying me a coffee is the real-world equivalent of tipping a helpful guildie.
+      </p>
+      <a
+        href="https://ko-fi.com/senzall"
+        target="_blank"
+        rel="noopener"
+        class="inline-flex items-center gap-2 bg-amber-500 hover:bg-amber-400 text-slate-900
+               font-semibold text-sm px-5 py-2.5 rounded-lg transition-colors"
+      >
+        ☕ Buy me a coffee
+      </a>
+    </div>
+
     <!-- Credits -->
     <div class="bg-slate-800 rounded-xl border border-slate-700 p-5">
       <h3 class="font-semibold text-white mb-4 flex items-center gap-2">

@@ -1,4 +1,4 @@
-import type { AccountInfo, AccountAchievement, AchievementCategory, AchievementGroup, AchievementDetail, ItemDetail, SkinDetail, MiniDetail, WizardsVaultSection, Mastery, AccountMastery, MasteryPoints } from '../types/gw2'
+import type { AccountInfo, AccountAchievement, AchievementCategory, AchievementGroup, AchievementDetail, ItemDetail, SkinDetail, MiniDetail, WizardsVaultSection, Mastery, AccountMastery, MasteryPoints, RaidWing, RaidInstance } from '../types/gw2'
 
 const BASE_URL = 'https://api.guildwars2.com/v2'
 
@@ -93,4 +93,29 @@ export async function getAccountMasteries(key: string): Promise<AccountMastery[]
 
 export async function getAccountMasteryPoints(key: string): Promise<MasteryPoints> {
   return apiFetch<MasteryPoints>('/account/mastery/points', key)
+}
+
+export async function getAccountWorldBosses(key: string): Promise<string[]> {
+  return apiFetch<string[]>('/account/worldbosses', key)
+}
+
+export async function getAccountMapChests(key: string): Promise<string[]> {
+  return apiFetch<string[]>('/account/mapchests', key)
+}
+
+export async function getAccountDungeons(key: string): Promise<string[]> {
+  return apiFetch<string[]>('/account/dungeons', key)
+}
+
+export async function getAccountRaids(key: string): Promise<string[]> {
+  return apiFetch<string[]>('/account/raids', key)
+}
+
+export async function getAllWorldBosses(): Promise<string[]> {
+  return apiFetch<string[]>('/worldbosses')
+}
+
+export async function getRaidWings(): Promise<RaidWing[]> {
+  const instances = await apiFetch<RaidInstance[]>('/raids?ids=all')
+  return instances.flatMap(r => r.wings)
 }

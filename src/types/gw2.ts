@@ -106,3 +106,18 @@ export interface SavedAccount {
   key: string
   accountName: string
 }
+
+export interface RaidEvent {
+  id: string
+  type: 'Checkpoint' | 'Boss'
+}
+
+export interface RaidWing {
+  id: string
+  events: RaidEvent[]
+}
+
+export interface RaidInstance {
+  id: string
+  wings: RaidWing[]
+}

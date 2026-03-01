@@ -191,6 +191,7 @@
           :achievements="enrichedAchievements"
           :bit-names-cache="bitNamesCache"
           :resolve-bit-names="resolveBitNames"
+          :api-key="savedKey"
         />
       </template>
 

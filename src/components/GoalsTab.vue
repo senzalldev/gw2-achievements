@@ -199,6 +199,48 @@
       </div>
     </div>
 
+    <!-- Raids This Week -->
+    <div v-if="raidWings.length > 0" class="bg-slate-800 rounded-xl border border-slate-700 overflow-hidden">
+      <div
+        class="flex items-center gap-4 p-5 cursor-pointer hover:bg-slate-700/30 transition-colors"
+        @click="raidsExpanded = !raidsExpanded"
+      >
+        <span class="text-2xl shrink-0">⚔️</span>
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center gap-2 flex-wrap">
+            <h3 class="font-semibold text-white">Raids This Week</h3>
+            <span class="text-xs bg-amber-900/40 text-amber-300 px-2 py-0.5 rounded-full shrink-0">
+              {{ raidsDone }} / {{ raidsTotal }} events
+            </span>
+          </div>
+          <p class="text-xs text-slate-400 mt-0.5">Resets Monday at 07:30 UTC</p>
+        </div>
+        <span
+          class="text-slate-400 text-xs transition-transform duration-200 shrink-0"
+          :style="{ display: 'inline-block', transform: raidsExpanded ? 'rotate(180deg)' : 'rotate(0deg)' }"
+        >▼</span>
+      </div>
+      <div v-if="raidsExpanded" class="border-t border-slate-700/50 divide-y divide-slate-700/30">
+        <div v-for="wing in raidWings" :key="wing.id" class="p-4">
+          <div class="flex items-center justify-between mb-2">
+            <span
+              class="text-sm font-medium"
+              :class="wingDoneCount(wing) === wing.events.length ? 'text-emerald-400' : 'text-white'"
+            >{{ formatWingId(wing.id) }}</span>
+            <span class="text-xs text-slate-500">{{ wingDoneCount(wing) }} / {{ wing.events.length }}</span>
+          </div>
+          <div class="flex flex-wrap gap-2">
+            <span
+              v-for="event in wing.events"
+              :key="event.id"
+              class="text-xs px-2.5 py-1 rounded-lg"
+              :class="doneRaids.includes(event.id) ? 'bg-emerald-900/40 text-emerald-400' : 'bg-slate-700 text-slate-400'"
+            >{{ formatEventId(event.id) }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- FAQ Section -->
     <div class="bg-slate-800 rounded-xl border border-slate-700 p-5">
       <h3 class="font-semibold text-white mb-4">Frequently Asked Questions</h3>
@@ -222,7 +264,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
+import { getRaidWings, getAccountRaids } from '../api/gw2'
+import type { RaidWing } from '../types/gw2'
 import type { EnrichedAchievement } from '../composables/useAchievements'
 import type { AchievementBit } from '../types/gw2'
 
@@ -230,7 +274,37 @@ const props = defineProps<{
   achievements: EnrichedAchievement[]
   bitNamesCache: Map<string, string>
   resolveBitNames: (bits: AchievementBit[]) => Promise<void>
+  apiKey: string
 }>()
+
+const raidWings = ref<RaidWing[]>([])
+const doneRaids = ref<string[]>([])
+const raidsExpanded = ref(true)
+
+const raidsTotal = computed(() => raidWings.value.reduce((s, w) => s + w.events.length, 0))
+const raidsDone = computed(() => doneRaids.value.length)
+
+function wingDoneCount(wing: RaidWing): number {
+  return wing.events.filter(e => doneRaids.value.includes(e.id)).length
+}
+
+function formatWingId(id: string): string {
+  return id.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
+}
+
+function formatEventId(id: string): string {
+  return id.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
+}
+
+onMounted(async () => {
+  try {
+    const [wings, done] = await Promise.all([getRaidWings(), getAccountRaids(props.apiKey)])
+    raidWings.value = wings
+    doneRaids.value = done
+  } catch {
+    // silent — not everyone raids
+  }
+})
 
 const openSections = ref(new Set<string>())
 const expanded = ref(new Set<number>())
