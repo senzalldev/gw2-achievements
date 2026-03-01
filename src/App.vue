@@ -275,13 +275,16 @@
       </template>
 
       <!-- Footer -->
-      <footer class="border-t border-slate-800 mt-4 py-4 flex items-center justify-center gap-2 text-xs text-slate-600">
-        <span>⚔️ GW2 Achievement Tracker</span>
-        <span>·</span>
-        <span>v{{ APP_VERSION }}</span>
-        <span>·</span>
-        <a href="https://senzall.com" target="_blank" rel="noopener"
-           class="text-amber-700 hover:text-amber-400 transition-colors">senzall.com</a>
+      <footer class="border-t border-slate-800 mt-4 py-4 text-center text-xs text-slate-600 space-y-1">
+        <div class="flex items-center justify-center gap-2">
+          <span>⚔️ GW2 Achievement Tracker</span>
+          <span>·</span>
+          <span>v{{ APP_VERSION }}</span>
+          <span>·</span>
+          <a href="https://senzall.com" target="_blank" rel="noopener"
+             class="text-amber-700 hover:text-amber-400 transition-colors">senzall.com</a>
+        </div>
+        <div class="text-slate-700">Not affiliated with ArenaNet or NCSoft. Guild Wars 2 © ArenaNet, LLC.</div>
       </footer>
 
     </main>
