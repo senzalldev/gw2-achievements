@@ -163,20 +163,31 @@
               <!-- Still to do: count-based -->
               <div
                 v-else-if="!item.account.done && item.account.current != null && item.account.max != null"
-                class="flex items-center justify-between gap-2"
+                class="space-y-2"
               >
-                <span class="text-xs text-slate-400">
-                  {{ (item.account.max - item.account.current).toLocaleString() }} more to go
-                </span>
-                <button
-                  @click.stop="copyRemaining(item)"
-                  class="text-xs px-3 py-1 rounded-lg border transition-colors shrink-0"
-                  :class="copyFeedback === item.account.id
-                    ? 'border-emerald-500 text-emerald-400 bg-emerald-900/20'
-                    : 'border-amber-400/40 text-amber-400 hover:border-amber-400 hover:bg-amber-400/10'"
-                >
-                  {{ copyFeedback === item.account.id ? '✓ Copied!' : '📋 Copy progress' }}
-                </button>
+                <div v-if="nextTierFor(item)" class="flex items-center gap-1.5 text-xs text-emerald-400 font-medium">
+                  <span>→</span>
+                  <span>
+                    Next milestone: {{ nextTierFor(item)?.count.toLocaleString() }}
+                    ({{ ((nextTierFor(item)?.count ?? 0) - (item.account.current ?? 0)).toLocaleString() }} more → +{{ nextTierFor(item)?.points }} AP)
+                  </span>
+                </div>
+                <div class="flex items-center justify-between gap-2">
+                  <span class="text-xs text-slate-400">
+                    {{ item.account.current.toLocaleString() }} / {{ item.account.max.toLocaleString() }}
+                    ({{ (item.account.max - item.account.current).toLocaleString() }} to go)
+                  </span>
+                  <button
+                    @click.stop="copyRemaining(item)"
+                    class="text-xs px-3 py-1 rounded-lg border transition-colors shrink-0"
+                    :class="copyFeedback === item.account.id
+                      ? 'border-emerald-500 text-emerald-400 bg-emerald-900/20'
+                      : 'border-amber-400/40 text-amber-400 hover:border-amber-400 hover:bg-amber-400/10'"
+                  >
+                    {{ copyFeedback === item.account.id ? '✓ Copied!' : '📋 Copy progress' }}
+                  </button>
+                </div>
+                <p class="text-xs text-slate-500">The wiki has a full breakdown of what counts as progress.</p>
               </div>
             </div>
           </div>
@@ -323,6 +334,12 @@ async function toggleExpand(item: EnrichedAchievement) {
 
 function wikiUrl(name: string): string {
   return `https://wiki.guildwars2.com/wiki/${encodeURIComponent(name.replace(/ /g, '_'))}`
+}
+
+function nextTierFor(item: EnrichedAchievement) {
+  if (item.detail.tiers.length <= 1) return null
+  const current = item.account.current ?? 0
+  return item.detail.tiers.find(t => t.count > current) ?? null
 }
 
 function isDisplayableBit(bit: AchievementBit): boolean {
