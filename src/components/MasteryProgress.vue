@@ -92,15 +92,24 @@
                 </span>
 
                 <div class="flex-1 min-w-0">
-                  <div
-                    class="text-sm font-medium"
-                    :class="{
-                      'text-emerald-300': idx < getLevel(mastery.id),
-                      'text-amber-300':   idx === getLevel(mastery.id) && !isTrackComplete(mastery.id, mastery.levels.length),
-                      'text-slate-500':   idx > getLevel(mastery.id),
-                    }"
-                  >
-                    {{ level.name }}
+                  <div class="flex items-center gap-2 flex-wrap">
+                    <span
+                      class="text-sm font-medium"
+                      :class="{
+                        'text-emerald-300': idx < getLevel(mastery.id),
+                        'text-amber-300':   idx === getLevel(mastery.id) && !isTrackComplete(mastery.id, mastery.levels.length),
+                        'text-slate-500':   idx > getLevel(mastery.id),
+                      }"
+                    >
+                      {{ level.name }}
+                    </span>
+                    <a
+                      :href="`https://wiki.guildwars2.com/wiki/${encodeURIComponent(level.name.replace(/ /g, '_'))}`"
+                      target="_blank"
+                      rel="noopener"
+                      @click.stop
+                      class="text-xs text-amber-400/60 hover:text-amber-300 transition-colors"
+                    >📖</a>
                   </div>
                   <div
                     v-if="level.description"

@@ -3,13 +3,21 @@
     <h3 class="font-semibold text-white mb-4">Browse Achievements</h3>
 
     <!-- Filters row 1: search -->
-    <input
-      v-model="search"
-      type="text"
-      placeholder="Search for an achievement... (e.g. Conservation of Magic)"
-      class="w-full bg-slate-900 border border-slate-600 text-white rounded-lg px-3 py-2 text-sm
-             placeholder-slate-500 focus:outline-none focus:border-amber-400 transition mb-3"
-    />
+    <div class="relative mb-3">
+      <input
+        v-model="search"
+        type="text"
+        placeholder="Search for an achievement... (e.g. Conservation of Magic)"
+        class="w-full bg-slate-900 border border-slate-600 text-white rounded-lg px-3 py-2 pr-8 text-sm
+               placeholder-slate-500 focus:outline-none focus:border-amber-400 transition"
+      />
+      <button
+        v-if="search"
+        @click="search = ''"
+        class="absolute right-2 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 transition-colors text-lg leading-none"
+        title="Clear search"
+      >×</button>
+    </div>
 
     <!-- Filters row 2: dropdowns -->
     <div class="flex flex-wrap gap-2 mb-4">
