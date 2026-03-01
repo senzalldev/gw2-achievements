@@ -159,6 +159,10 @@
 
         <!-- Expanded detail -->
         <div v-if="expanded.has(item.account.id)" class="mt-3 pt-3 border-t border-slate-600">
+          <div v-if="item.detail.locked_text" class="flex items-start gap-2 p-2 rounded-lg bg-amber-900/20 border border-amber-900/40 mb-2">
+            <span class="text-amber-400 shrink-0">🔒</span>
+            <p class="text-xs text-amber-300"><strong class="text-amber-400">Unlock requirement:</strong> {{ item.detail.locked_text }}</p>
+          </div>
           <p v-if="item.detail.requirement" class="text-xs text-slate-400 mb-2">
             <strong class="text-slate-300">Requirement:</strong> {{ item.detail.requirement }}
           </p>
