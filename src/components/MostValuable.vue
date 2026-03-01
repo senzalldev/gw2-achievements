@@ -213,7 +213,7 @@ const excludeFestivals = ref(false)
 
 const FESTIVAL_KEYWORDS = [
   'wintersday', 'halloween', 'shadow of the mad king', 'blood and madness',
-  'lunar new year', 'dragon bash', 'festival of the four winds',
+  'lunar new year', "new year's customs", 'dragon bash', 'festival of the four winds',
   'bazaar of the four winds', 'super adventure', 'seasonal activities',
   'toymaker tixx', 'mad king',
 ]
