@@ -10,127 +10,147 @@
     </div>
 
     <template v-else>
-      <!-- Daily -->
-      <div v-if="daily" class="bg-slate-800 rounded-xl p-5 border border-slate-700">
-        <div class="flex items-start justify-between mb-1 flex-wrap gap-2">
-          <div>
-            <h3 class="font-semibold text-white">🏛️ Daily</h3>
-            <p class="text-xs text-slate-500">Resets at 00:00 UTC</p>
-          </div>
-          <div class="text-right">
-            <div class="text-sm font-semibold text-amber-400">{{ sectionDone(daily) }} / {{ daily.objectives.length }} done</div>
-            <div class="text-xs text-slate-500">{{ sectionAcclaim(daily) }} Astral Acclaim available</div>
-          </div>
-        </div>
-        <MetaBar :section="daily" />
-        <ObjectiveList :objectives="daily.objectives" />
-      </div>
-
-      <!-- Weekly -->
-      <div v-if="weekly" class="bg-slate-800 rounded-xl p-5 border border-slate-700">
-        <div class="flex items-start justify-between mb-1 flex-wrap gap-2">
-          <div>
-            <h3 class="font-semibold text-white">🏛️ Weekly</h3>
-            <p class="text-xs text-slate-500">Resets Monday at 07:30 UTC</p>
-          </div>
-          <div class="text-right">
-            <div class="text-sm font-semibold text-amber-400">{{ sectionDone(weekly) }} / {{ weekly.objectives.length }} done</div>
-            <div class="text-xs text-slate-500">{{ sectionAcclaim(weekly) }} Astral Acclaim available</div>
-          </div>
-        </div>
-        <MetaBar :section="weekly" />
-        <ObjectiveList :objectives="weekly.objectives" />
-      </div>
-
-      <!-- Special -->
-      <div v-if="special" class="bg-slate-800 rounded-xl p-5 border border-slate-700">
-        <div class="flex items-start justify-between mb-1 flex-wrap gap-2">
-          <div>
-            <h3 class="font-semibold text-white">🏛️ Special</h3>
-            <p class="text-xs text-slate-500">Limited-time objectives</p>
-          </div>
-          <div class="text-right">
-            <div class="text-sm font-semibold text-amber-400">{{ sectionDone(special) }} / {{ special.objectives.length }} done</div>
-            <div class="text-xs text-slate-500">{{ sectionAcclaim(special) }} Astral Acclaim available</div>
-          </div>
-        </div>
-        <MetaBar :section="special" />
-        <ObjectiveList :objectives="special.objectives" />
-      </div>
+      <VaultSection v-if="daily"   key="daily"   title="Daily"   reset-label="Resets at 00:00 UTC"            :section="daily" />
+      <VaultSection v-if="weekly"  key="weekly"  title="Weekly"  reset-label="Resets Monday at 07:30 UTC"     :section="weekly" />
+      <VaultSection v-if="special" key="special" title="Special" reset-label="Limited-time objectives"        :section="special" />
     </template>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, defineComponent, h, computed } from 'vue'
 import { getWizardsVaultDaily, getWizardsVaultWeekly, getWizardsVaultSpecial } from '../api/gw2'
 import type { WizardsVaultSection, WizardsVaultObjective } from '../types/gw2'
 
-// ---- child components (defined inline to avoid extra files) ----
+// ── inline sub-component ──────────────────────────────────────────────────────
 
-const MetaBar = {
-  props: ['section'],
-  template: `
-    <div class="mt-3 mb-4 p-3 bg-slate-700/40 rounded-lg">
-      <div class="flex items-center justify-between text-xs mb-1.5">
-        <span class="text-slate-400">Meta reward progress</span>
-        <span :class="section.meta_reward_claimed ? 'text-emerald-400' : 'text-amber-400'">
-          {{ section.meta_reward_claimed ? '✓ Claimed' : section.meta_progress_current + ' / ' + section.meta_progress_complete }}
-        </span>
-      </div>
-      <div class="w-full bg-slate-600 rounded-full h-1.5">
-        <div class="h-1.5 rounded-full" :class="section.meta_reward_claimed ? 'bg-emerald-500' : 'bg-amber-400'"
-             :style="{ width: metaPct + '%' }"></div>
-      </div>
-      <div class="text-xs text-slate-500 mt-1">+{{ section.meta_reward_astral }} ✦ Astral Acclaim on completion</div>
-    </div>
-  `,
-  computed: {
-    metaPct(): number {
-      return (this as any).section.meta_progress_complete > 0
-        ? Math.min(100, Math.round((this as any).section.meta_progress_current / (this as any).section.meta_progress_complete * 100))
+const VaultSection = defineComponent({
+  name: 'VaultSection',
+  props: {
+    title: { type: String, required: true },
+    resetLabel: { type: String, required: true },
+    section: { type: Object as () => WizardsVaultSection, required: true },
+  },
+  setup(props) {
+    const expanded = ref(true)
+
+    const done = computed(() =>
+      props.section.objectives.filter(o => o.claimed || o.progress_current >= o.progress_complete).length
+    )
+    const total = computed(() => props.section.objectives.length)
+    const totalAcclaim = computed(() => props.section.objectives.reduce((s, o) => s + o.acclaim, 0))
+    const metaPct = computed(() =>
+      props.section.meta_progress_complete > 0
+        ? Math.min(100, Math.round(props.section.meta_progress_current / props.section.meta_progress_complete * 100))
         : 100
-    },
-  },
-}
+    )
 
-const ObjectiveList = {
-  props: ['objectives'],
-  template: `
-    <div class="space-y-2">
-      <div v-for="obj in objectives" :key="obj.id"
-           class="flex items-center gap-3 rounded-lg px-3 py-2.5"
-           :class="isDone(obj) ? 'bg-slate-700/20' : 'bg-slate-700/40'">
-        <span class="text-lg shrink-0">{{ isDone(obj) ? '✅' : '⬜' }}</span>
-        <div class="flex-1 min-w-0">
-          <div class="text-sm font-medium" :class="isDone(obj) ? 'text-slate-500 line-through' : 'text-white'">
-            {{ obj.title }}
-          </div>
-          <div v-if="obj.progress_complete > 1" class="flex items-center gap-2 mt-1">
-            <div class="flex-1 bg-slate-600 rounded-full h-1">
-              <div class="h-1 rounded-full" :class="isDone(obj) ? 'bg-emerald-500' : 'bg-amber-400'"
-                   :style="{ width: objPct(obj) + '%' }"></div>
-            </div>
-            <span class="text-xs text-slate-500 font-mono whitespace-nowrap">{{ obj.progress_current }}/{{ obj.progress_complete }}</span>
-          </div>
-        </div>
-        <div class="text-xs font-semibold shrink-0" :class="isDone(obj) ? 'text-slate-600' : 'text-amber-400'">
-          +{{ obj.acclaim }} ✦
-        </div>
-      </div>
-    </div>
-  `,
-  methods: {
-    isDone(obj: WizardsVaultObjective) {
-      return obj.claimed || obj.progress_current >= obj.progress_complete
-    },
-    objPct(obj: WizardsVaultObjective) {
-      return obj.progress_complete > 0 ? Math.min(100, Math.round(obj.progress_current / obj.progress_complete * 100)) : 100
-    },
-  },
-}
+    function isDone(o: WizardsVaultObjective) {
+      return o.claimed || o.progress_current >= o.progress_complete
+    }
+    function objPct(o: WizardsVaultObjective) {
+      return o.progress_complete > 0
+        ? Math.min(100, Math.round(o.progress_current / o.progress_complete * 100))
+        : 100
+    }
 
-// ---- main component ----
+    return () => {
+      const sec = props.section
+
+      // ── header (always visible, clickable) ──────────────────────────────
+      const header = h(
+        'button',
+        {
+          class: 'w-full flex items-center justify-between gap-3 text-left group',
+          onClick: () => { expanded.value = !expanded.value },
+        },
+        [
+          h('div', { class: 'flex items-center gap-3' }, [
+            h('span', { class: 'text-xl' }, '🏛️'),
+            h('div', {}, [
+              h('h3', { class: 'font-semibold text-white group-hover:text-amber-300 transition-colors' }, props.title),
+              h('p', { class: 'text-xs text-slate-500' }, props.resetLabel),
+            ]),
+          ]),
+          h('div', { class: 'flex items-center gap-4 shrink-0' }, [
+            h('div', { class: 'text-right' }, [
+              h('div', { class: 'text-sm font-semibold text-amber-400' }, `${done.value} / ${total.value} done`),
+              h('div', { class: 'text-xs text-slate-500' }, `${totalAcclaim.value} ✦ available`),
+            ]),
+            h('span', {
+              class: `text-slate-400 transition-transform duration-200 ${expanded.value ? 'rotate-180' : ''}`,
+              style: { display: 'inline-block' },
+            }, '▼'),
+          ]),
+        ]
+      )
+
+      // ── collapsible body ─────────────────────────────────────────────────
+      const body = expanded.value
+        ? h('div', { class: 'mt-4 space-y-4' }, [
+
+            // meta reward progress bar
+            h('div', { class: 'p-3 bg-slate-700/40 rounded-lg' }, [
+              h('div', { class: 'flex items-center justify-between text-xs mb-1.5' }, [
+                h('span', { class: 'text-slate-400' }, 'Meta reward progress'),
+                h('span', { class: sec.meta_reward_claimed ? 'text-emerald-400' : 'text-amber-400' },
+                  sec.meta_reward_claimed
+                    ? '✓ Claimed'
+                    : `${sec.meta_progress_current} / ${sec.meta_progress_complete}`
+                ),
+              ]),
+              h('div', { class: 'w-full bg-slate-600 rounded-full h-1.5' }, [
+                h('div', {
+                  class: `h-1.5 rounded-full ${sec.meta_reward_claimed ? 'bg-emerald-500' : 'bg-amber-400'}`,
+                  style: { width: metaPct.value + '%' },
+                }),
+              ]),
+              h('div', { class: 'text-xs text-slate-500 mt-1' },
+                `+${sec.meta_reward_astral} ✦ Astral Acclaim on completion`
+              ),
+            ]),
+
+            // objective list
+            h('div', { class: 'space-y-2' },
+              sec.objectives.map(obj =>
+                h('div', {
+                  key: obj.id,
+                  class: `flex items-center gap-3 rounded-lg px-3 py-2.5 ${isDone(obj) ? 'bg-slate-700/20' : 'bg-slate-700/50'}`,
+                }, [
+                  h('span', { class: 'text-lg shrink-0' }, isDone(obj) ? '✅' : '⬜'),
+                  h('div', { class: 'flex-1 min-w-0' }, [
+                    h('div', {
+                      class: `text-sm font-medium ${isDone(obj) ? 'text-slate-500 line-through' : 'text-white'}`,
+                    }, obj.title),
+                    obj.progress_complete > 1
+                      ? h('div', { class: 'flex items-center gap-2 mt-1' }, [
+                          h('div', { class: 'flex-1 bg-slate-600 rounded-full h-1' }, [
+                            h('div', {
+                              class: `h-1 rounded-full ${isDone(obj) ? 'bg-emerald-500' : 'bg-amber-400'}`,
+                              style: { width: objPct(obj) + '%' },
+                            }),
+                          ]),
+                          h('span', { class: 'text-xs text-slate-500 font-mono whitespace-nowrap' },
+                            `${obj.progress_current} / ${obj.progress_complete}`
+                          ),
+                        ])
+                      : null,
+                  ]),
+                  h('div', {
+                    class: `text-xs font-semibold shrink-0 ${isDone(obj) ? 'text-slate-600' : 'text-amber-400'}`,
+                  }, `+${obj.acclaim} ✦`),
+                ])
+              )
+            ),
+          ])
+        : null
+
+      return h('div', { class: 'bg-slate-800 rounded-xl p-5 border border-slate-700' }, [header, body])
+    }
+  },
+})
+
+// ── main component ────────────────────────────────────────────────────────────
 
 const props = defineProps<{ apiKey: string }>()
 
@@ -139,14 +159,6 @@ const error = ref('')
 const daily = ref<WizardsVaultSection | null>(null)
 const weekly = ref<WizardsVaultSection | null>(null)
 const special = ref<WizardsVaultSection | null>(null)
-
-function sectionDone(s: WizardsVaultSection) {
-  return s.objectives.filter(o => o.claimed || o.progress_current >= o.progress_complete).length
-}
-
-function sectionAcclaim(s: WizardsVaultSection) {
-  return s.objectives.reduce((sum, o) => sum + o.acclaim, 0)
-}
 
 onMounted(async () => {
   const results = await Promise.allSettled([
