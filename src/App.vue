@@ -72,17 +72,27 @@
           />
           <CategoryPointsChart :category-stats="categoryStats" />
         </div>
-        <AlmostDone :items="almostDone" />
+        <AlmostDone :items="almostDone" @select="jumpToAchievement" />
       </template>
 
       <!-- Categories tab -->
       <template v-if="activeTab === 'categories'">
         <div class="bg-slate-800 rounded-xl p-5 border border-slate-700">
           <h3 class="font-semibold text-white mb-1">Category Breakdown</h3>
-          <p class="text-xs text-slate-500 mb-4">Click a category to browse its achievements</p>
+          <p class="text-xs text-slate-500 mb-3">Click a category to browse its achievements</p>
+          <input
+            v-model="categorySearch"
+            type="text"
+            placeholder="Search categories..."
+            class="w-full bg-slate-900 border border-slate-600 text-white rounded-lg px-3 py-2 text-sm
+                   placeholder-slate-500 focus:outline-none focus:border-amber-400 transition mb-4"
+          />
+          <div v-if="filteredCategoryStats.length === 0" class="text-slate-500 text-sm text-center py-6">
+            No categories match "{{ categorySearch }}".
+          </div>
           <div class="space-y-3">
             <div
-              v-for="cat in categoryStats"
+              v-for="cat in filteredCategoryStats"
               :key="cat.category.id"
               class="bg-slate-700/40 rounded-lg p-4 hover:bg-slate-700/70 transition-colors cursor-pointer"
               @click="jumpToCategory(cat.category.id)"
@@ -113,6 +123,7 @@
           :achievements="enrichedAchievements"
           :categories="allCategories"
           :preset-category="presetCategory"
+          :preset-search="presetSearch"
           :bit-names-cache="bitNamesCache"
           :resolve-bit-names="resolveBitNames"
         />
@@ -120,7 +131,7 @@
 
       <!-- Daily tab -->
       <template v-if="activeTab === 'daily'">
-        <DailyAchievements :account-done-ids="accountDoneIds" />
+        <DailyAchievements :api-key="savedKey" />
       </template>
 
       <!-- Masteries tab -->
@@ -135,7 +146,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { useAchievements } from './composables/useAchievements'
-import type { CategoryStats } from './composables/useAchievements'
+import type { CategoryStats, EnrichedAchievement } from './composables/useAchievements'
 import ApiKeyInput from './components/ApiKeyInput.vue'
 import StatsCards from './components/StatsCards.vue'
 import StatusDonut from './components/StatusDonut.vue'
@@ -154,12 +165,16 @@ const {
 
 const allCategories = computed(() => categoryStats.value.map(cs => cs.category))
 
-const accountDoneIds = computed(() =>
-  new Set(enrichedAchievements.value.filter(a => a.account.done).map(a => a.account.id))
-)
-
 const activeTab = ref<'overview' | 'categories' | 'browse' | 'daily' | 'masteries'>('overview')
 const presetCategory = ref<number | ''>('')
+const presetSearch = ref('')
+const categorySearch = ref('')
+
+const filteredCategoryStats = computed(() => {
+  const q = categorySearch.value.toLowerCase().trim()
+  if (!q) return categoryStats.value
+  return categoryStats.value.filter(cat => cat.category.name.toLowerCase().includes(q))
+})
 
 const tabs = [
   { id: 'overview' as const, label: 'Overview' },
@@ -175,6 +190,13 @@ function catCompletionPct(cat: CategoryStats): number {
 
 function jumpToCategory(catId: number) {
   presetCategory.value = catId
+  presetSearch.value = ''
+  activeTab.value = 'browse'
+}
+
+function jumpToAchievement(item: EnrichedAchievement) {
+  presetCategory.value = ''
+  presetSearch.value = item.detail.name
   activeTab.value = 'browse'
 }
 

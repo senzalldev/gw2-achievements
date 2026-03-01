@@ -1,4 +1,4 @@
-import type { AccountInfo, AccountAchievement, AchievementCategory, AchievementDetail, ItemDetail, SkinDetail, MiniDetail, DailyAchievements, Mastery, AccountMastery, MasteryPoints } from '../types/gw2'
+import type { AccountInfo, AccountAchievement, AchievementCategory, AchievementDetail, ItemDetail, SkinDetail, MiniDetail, WizardsVaultSection, Mastery, AccountMastery, MasteryPoints } from '../types/gw2'
 
 const BASE_URL = 'https://api.guildwars2.com/v2'
 
@@ -67,8 +67,16 @@ export async function resolveMinis(ids: number[]): Promise<Map<number, string>> 
   return resolveByType<MiniDetail>('/minis', ids)
 }
 
-export async function getDailyAchievements(): Promise<DailyAchievements> {
-  return apiFetch<DailyAchievements>('/achievements/daily')
+export async function getWizardsVaultDaily(key: string): Promise<WizardsVaultSection> {
+  return apiFetch<WizardsVaultSection>('/account/wizardsvault/daily', key)
+}
+
+export async function getWizardsVaultWeekly(key: string): Promise<WizardsVaultSection> {
+  return apiFetch<WizardsVaultSection>('/account/wizardsvault/weekly', key)
+}
+
+export async function getWizardsVaultSpecial(key: string): Promise<WizardsVaultSection> {
+  return apiFetch<WizardsVaultSection>('/account/wizardsvault/special', key)
 }
 
 export async function getMasteries(): Promise<Mastery[]> {

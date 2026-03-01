@@ -212,15 +212,20 @@ const props = defineProps<{
   achievements: EnrichedAchievement[]
   categories: AchievementCategory[]
   presetCategory?: number | ''
+  presetSearch?: string
   bitNamesCache: Map<string, string>
   resolveBitNames: (bits: AchievementBit[]) => Promise<void>
 }>()
 
-const search = ref('')
+const search = ref(props.presetSearch ?? '')
 const selectedCategory = ref<number | ''>(props.presetCategory ?? '')
 
 watch(() => props.presetCategory, (val) => {
   if (val !== undefined) selectedCategory.value = val
+})
+
+watch(() => props.presetSearch, (val) => {
+  if (val !== undefined) search.value = val
 })
 const statusFilter = ref<'all' | 'incomplete' | 'done' | 'inprogress'>('incomplete')
 const visibleCount = ref(50)

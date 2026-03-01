@@ -60,13 +60,23 @@ export interface ItemDetail { id: number; name: string }
 export interface SkinDetail { id: number; name: string }
 export interface MiniDetail { id: number; name: string }
 
-export interface DailyEntry { id: number; level: { min: number; max: number } }
-export interface DailyAchievements {
-  pve: DailyEntry[]
-  pvp: DailyEntry[]
-  wvw: DailyEntry[]
-  fractals: DailyEntry[]
-  special: DailyEntry[]
+export interface WizardsVaultObjective {
+  id: number
+  title: string
+  track: string
+  acclaim: number
+  progress_current: number
+  progress_complete: number
+  claimed: boolean
+}
+
+export interface WizardsVaultSection {
+  meta_progress_current: number
+  meta_progress_complete: number
+  meta_reward_item_id: number
+  meta_reward_astral: number
+  meta_reward_claimed: boolean
+  objectives: WizardsVaultObjective[]
 }
 
 export interface MasteryLevel { name: string; description: string; point_cost: number; exp_cost: number }

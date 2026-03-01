@@ -1,7 +1,7 @@
 <template>
   <div class="bg-slate-800 rounded-xl p-5 border border-slate-700">
     <h3 class="font-semibold text-white mb-1">Almost Done <span class="text-amber-400">({{ items.length }})</span></h3>
-    <p class="text-xs text-slate-500 mb-4">Achievements you've started that are at least 25% complete</p>
+    <p class="text-xs text-slate-500 mb-4">Click any achievement to see details and what's left to do</p>
 
     <div v-if="items.length === 0" class="text-slate-500 text-sm text-center py-4">
       No in-progress achievements found.
@@ -11,7 +11,8 @@
       <div
         v-for="item in items"
         :key="item.account.id"
-        class="bg-slate-700/50 rounded-lg p-3 hover:bg-slate-700 transition-colors"
+        class="bg-slate-700/50 rounded-lg p-3 hover:bg-slate-700 transition-colors cursor-pointer"
+        @click="$emit('select', item)"
       >
         <div class="flex justify-between items-start mb-1">
           <div class="flex-1 min-w-0 mr-3">
@@ -43,9 +44,8 @@
 <script setup lang="ts">
 import type { EnrichedAchievement } from '../composables/useAchievements'
 
-defineProps<{
-  items: EnrichedAchievement[]
-}>()
+defineProps<{ items: EnrichedAchievement[] }>()
+defineEmits<{ select: [item: EnrichedAchievement] }>()
 
 function progressColor(pct: number): string {
   if (pct >= 80) return 'bg-emerald-400'
