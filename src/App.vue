@@ -113,6 +113,15 @@
         />
       </template>
 
+      <!-- Goals tab -->
+      <template v-if="activeTab === 'goals'">
+        <GoalsTab
+          :achievements="enrichedAchievements"
+          :bit-names-cache="bitNamesCache"
+          :resolve-bit-names="resolveBitNames"
+        />
+      </template>
+
       <!-- Categories tab -->
       <template v-if="activeTab === 'categories'">
         <div class="bg-slate-800 rounded-xl p-5 border border-slate-700">
@@ -191,6 +200,7 @@ import StatusDonut from './components/StatusDonut.vue'
 import CategoryPointsChart from './components/CategoryPointsChart.vue'
 import AlmostDone from './components/AlmostDone.vue'
 import MostValuable from './components/MostValuable.vue'
+import GoalsTab from './components/GoalsTab.vue'
 import AchievementList from './components/AchievementList.vue'
 import DailyAchievements from './components/DailyAchievements.vue'
 import MasteryProgress from './components/MasteryProgress.vue'
@@ -204,7 +214,7 @@ const {
 
 const allCategories = computed(() => categoryStats.value.map(cs => cs.category))
 
-const activeTab = ref<'overview' | 'almostdone' | 'mostvaluable' | 'categories' | 'browse' | 'daily' | 'masteries'>('overview')
+const activeTab = ref<'overview' | 'almostdone' | 'mostvaluable' | 'goals' | 'categories' | 'browse' | 'daily' | 'masteries'>('overview')
 const presetCategory = ref<number | ''>('')
 const presetSearch = ref('')
 const categorySearch = ref('')
@@ -219,6 +229,7 @@ const tabs = [
   { id: 'overview' as const, label: 'Overview' },
   { id: 'almostdone' as const, label: 'Almost Done' },
   { id: 'mostvaluable' as const, label: 'Most Valuable' },
+  { id: 'goals' as const, label: 'Goals' },
   { id: 'categories' as const, label: 'Categories' },
   { id: 'browse' as const, label: 'Browse All' },
   { id: 'daily' as const, label: 'Daily' },
