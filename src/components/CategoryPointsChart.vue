@@ -1,21 +1,31 @@
 <template>
   <div class="bg-slate-800 rounded-xl p-5 border border-slate-700">
-    <div class="flex items-center justify-between mb-4 gap-3 flex-wrap">
+    <div class="flex items-center justify-between mb-3 gap-3 flex-wrap">
       <h3 class="font-semibold text-white">
         {{ mode === 'potential' ? 'AP Potential by Category' : 'AP Earned by Category' }}
         <span class="text-xs text-slate-400 font-normal">(top {{ displayCount }})</span>
       </h3>
-      <div class="flex rounded-lg overflow-hidden border border-slate-600 shrink-0 text-xs">
+      <div class="flex items-center gap-2 flex-wrap">
         <button
-          @click="mode = 'potential'"
-          class="px-3 py-1.5 transition-colors font-medium"
-          :class="mode === 'potential' ? 'bg-purple-600 text-white' : 'text-slate-400 hover:text-slate-200'"
-        >Potential</button>
-        <button
-          @click="mode = 'earned'"
-          class="px-3 py-1.5 transition-colors font-medium"
-          :class="mode === 'earned' ? 'bg-amber-500 text-slate-900' : 'text-slate-400 hover:text-slate-200'"
-        >Earned</button>
+          @click="excludeFestivals = !excludeFestivals"
+          class="text-xs px-3 py-1.5 rounded-lg border transition-colors font-medium"
+          :class="excludeFestivals
+            ? 'border-amber-400 text-amber-400 bg-amber-400/10'
+            : 'border-slate-600 text-slate-400 hover:text-slate-200'"
+          title="Festival achievements are time-gated and only available during seasonal events"
+        >🎪 {{ excludeFestivals ? 'Festivals hidden' : 'Hide festivals' }}</button>
+        <div class="flex rounded-lg overflow-hidden border border-slate-600 shrink-0 text-xs">
+          <button
+            @click="mode = 'potential'"
+            class="px-3 py-1.5 transition-colors font-medium"
+            :class="mode === 'potential' ? 'bg-purple-600 text-white' : 'text-slate-400 hover:text-slate-200'"
+          >Potential</button>
+          <button
+            @click="mode = 'earned'"
+            class="px-3 py-1.5 transition-colors font-medium"
+            :class="mode === 'earned' ? 'bg-amber-500 text-slate-900' : 'text-slate-400 hover:text-slate-200'"
+          >Earned</button>
+        </div>
       </div>
     </div>
 
@@ -51,16 +61,35 @@ const props = defineProps<{
 const emit = defineEmits<{ select: [catId: number] }>()
 
 const mode = ref<'potential' | 'earned'>('potential')
+const excludeFestivals = ref(false)
 const displayCount = 15
+
+const FESTIVAL_KEYWORDS = [
+  'wintersday', 'halloween', 'shadow of the mad king', 'blood and madness',
+  'lunar new year', 'dragon bash', 'festival of the four winds',
+  'bazaar of the four winds', 'super adventure', 'seasonal activities',
+  'toymaker tixx', 'mad king',
+]
+
+function isFestivalCategory(name: string): boolean {
+  const lower = name.toLowerCase()
+  return FESTIVAL_KEYWORDS.some(kw => lower.includes(kw))
+}
+
+const filteredStats = computed(() =>
+  excludeFestivals.value
+    ? props.categoryStats.filter(c => !isFestivalCategory(c.category.name))
+    : props.categoryStats
+)
 
 const topCategories = computed(() => {
   if (mode.value === 'potential') {
-    return [...props.categoryStats]
+    return [...filteredStats.value]
       .filter(c => c.totalPoints - c.earnedPoints > 0)
       .sort((a, b) => (b.totalPoints - b.earnedPoints) - (a.totalPoints - a.earnedPoints))
       .slice(0, displayCount)
   }
-  return [...props.categoryStats]
+  return [...filteredStats.value]
     .sort((a, b) => b.earnedPoints - a.earnedPoints)
     .slice(0, displayCount)
 })

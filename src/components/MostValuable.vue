@@ -1,25 +1,35 @@
 <template>
   <div class="bg-slate-800 rounded-xl p-5 border border-slate-700">
-    <div class="flex items-center justify-between mb-1">
+    <div class="flex items-center justify-between mb-1 gap-3 flex-wrap">
       <h3 class="font-semibold text-white">
         Most Valuable Remaining
-        <span class="text-purple-400">({{ items.length }})</span>
+        <span class="text-purple-400">({{ visibleItems.length }})</span>
       </h3>
-      <button
-        v-if="expanded.size > 0"
-        @click="expanded = new Set()"
-        class="text-xs text-slate-500 hover:text-slate-300 transition-colors"
-      >Collapse all</button>
+      <div class="flex items-center gap-3">
+        <button
+          @click="excludeFestivals = !excludeFestivals"
+          class="text-xs px-3 py-1 rounded-lg border transition-colors"
+          :class="excludeFestivals
+            ? 'border-amber-400 text-amber-400 bg-amber-400/10'
+            : 'border-slate-600 text-slate-400 hover:text-slate-200'"
+          title="Festival achievements are time-gated and only available during seasonal events"
+        >🎪 {{ excludeFestivals ? 'Festivals hidden' : 'Hide festivals' }}</button>
+        <button
+          v-if="expanded.size > 0"
+          @click="expanded = new Set()"
+          class="text-xs text-slate-500 hover:text-slate-300 transition-colors"
+        >Collapse all</button>
+      </div>
     </div>
     <p class="text-xs text-slate-500 mb-4">Incomplete achievements with the most AP still earnable — biggest gains first. Click any to see what's left and how to finish it</p>
 
-    <div v-if="items.length === 0" class="text-slate-500 text-sm text-center py-4">
+    <div v-if="visibleItems.length === 0" class="text-slate-500 text-sm text-center py-4">
       No incomplete achievements with AP remaining found.
     </div>
 
     <div v-else class="space-y-2">
       <div
-        v-for="item in items"
+        v-for="item in visibleItems"
         :key="item.account.id"
         class="bg-slate-700/40 rounded-lg overflow-hidden"
       >
@@ -181,7 +191,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import type { EnrichedAchievement } from '../composables/useAchievements'
 import type { AchievementBit } from '../types/gw2'
 
@@ -195,6 +205,23 @@ defineEmits<{ select: [item: EnrichedAchievement] }>()
 
 const expanded = ref(new Set<number>())
 const copyFeedback = ref<number | null>(null)
+const excludeFestivals = ref(false)
+
+const FESTIVAL_KEYWORDS = [
+  'wintersday', 'halloween', 'shadow of the mad king', 'blood and madness',
+  'lunar new year', 'dragon bash', 'festival of the four winds',
+  'bazaar of the four winds', 'super adventure', 'seasonal activities',
+  'toymaker tixx', 'mad king',
+]
+
+const visibleItems = computed(() =>
+  excludeFestivals.value
+    ? props.items.filter(a => {
+        const name = (a.category?.name ?? '').toLowerCase()
+        return !FESTIVAL_KEYWORDS.some(kw => name.includes(kw))
+      })
+    : props.items
+)
 
 function wikiUrl(name: string): string {
   return `https://wiki.guildwars2.com/wiki/${encodeURIComponent(name.replace(/ /g, '_'))}`
