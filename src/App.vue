@@ -6,7 +6,8 @@
       :loading-stage="loadingStage"
       :error="error"
       :saved-accounts="savedAccounts"
-      @submit="loadData"
+      :open-on-form="loginOpenOnForm"
+      @submit="handleLogin"
       @remove="removeAccount"
     />
   </div>
@@ -26,7 +27,13 @@
     <header class="bg-slate-800 border-b border-slate-700 px-4 py-3 sm:px-6 sm:py-4">
       <div class="max-w-7xl mx-auto flex items-center justify-between flex-wrap gap-3">
         <div>
-          <h1 class="text-xl font-bold text-amber-400">⚔️ GW2 Achievement Tracker</h1>
+          <div class="flex items-center gap-2">
+            <h1 class="text-xl font-bold text-amber-400">⚔️ GW2 Achievement Tracker</h1>
+            <a href="https://senzall.com" target="_blank" rel="noopener"
+               class="text-xs text-slate-600 hover:text-slate-400 transition-colors hidden sm:block">
+              senzall.com ↗
+            </a>
+          </div>
           <p class="text-sm text-slate-400">
             {{ accountInfo?.name }}
             <span class="text-slate-600 mx-1">·</span>
@@ -301,6 +308,7 @@ const presetSearch = ref('')
 const presetStatus = ref<'all' | 'incomplete' | 'done' | 'inprogress' | 'notstarted' | undefined>(undefined)
 const categorySearch = ref('')
 const accountsOpen = ref(false)
+const loginOpenOnForm = ref(false)
 
 const filteredCategoryStats = computed(() => {
   const q = categorySearch.value.toLowerCase().trim()
@@ -351,7 +359,13 @@ function switchTo(acct: SavedAccount) {
 
 function addAccount() {
   accountsOpen.value = false
+  loginOpenOnForm.value = true
   reset()
+}
+
+function handleLogin(key: string) {
+  loginOpenOnForm.value = false
+  loadData(key)
 }
 
 // Auto-load if a key was remembered from last session

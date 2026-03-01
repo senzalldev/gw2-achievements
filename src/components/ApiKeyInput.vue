@@ -147,6 +147,7 @@ const props = defineProps<{
   loadingStage: string
   error: string
   savedAccounts?: SavedAccount[]
+  openOnForm?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -154,7 +155,7 @@ const emit = defineEmits<{
   remove: [key: string]
 }>()
 
-const showAddForm = ref((props.savedAccounts?.length ?? 0) === 0)
+const showAddForm = ref(props.openOnForm || (props.savedAccounts?.length ?? 0) === 0)
 const key = ref('')
 
 function submit() {
