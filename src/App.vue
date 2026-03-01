@@ -73,6 +73,7 @@
           <CategoryPointsChart :category-stats="categoryStats" />
         </div>
         <AlmostDone :items="almostDone" @select="jumpToAchievement" />
+        <MostValuable :items="mostValuable" @select="jumpToAchievement" />
       </template>
 
       <!-- Categories tab -->
@@ -152,6 +153,7 @@ import StatsCards from './components/StatsCards.vue'
 import StatusDonut from './components/StatusDonut.vue'
 import CategoryPointsChart from './components/CategoryPointsChart.vue'
 import AlmostDone from './components/AlmostDone.vue'
+import MostValuable from './components/MostValuable.vue'
 import AchievementList from './components/AchievementList.vue'
 import DailyAchievements from './components/DailyAchievements.vue'
 import MasteryProgress from './components/MasteryProgress.vue'
@@ -159,7 +161,7 @@ import MasteryProgress from './components/MasteryProgress.vue'
 const {
   accountInfo, loading, error, loadingStage, savedKey,
   bitNamesCache, resolveBitNames,
-  enrichedAchievements, stats, categoryStats, almostDone,
+  enrichedAchievements, stats, categoryStats, almostDone, mostValuable,
   loadData, reset,
 } = useAchievements()
 

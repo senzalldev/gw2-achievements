@@ -2,34 +2,58 @@
   <div class="bg-slate-800 rounded-xl p-5 border border-slate-700">
     <h3 class="font-semibold text-white mb-4">Browse Achievements</h3>
 
-    <!-- Filters -->
-    <div class="flex flex-col sm:flex-row gap-3 mb-4">
-      <input
-        v-model="search"
-        type="text"
-        placeholder="Search for an achievement... (e.g. Conservation of Magic)"
-        class="flex-1 bg-slate-900 border border-slate-600 text-white rounded-lg px-3 py-2 text-sm
-               placeholder-slate-500 focus:outline-none focus:border-amber-400 transition"
-      />
+    <!-- Filters row 1: search -->
+    <input
+      v-model="search"
+      type="text"
+      placeholder="Search for an achievement... (e.g. Conservation of Magic)"
+      class="w-full bg-slate-900 border border-slate-600 text-white rounded-lg px-3 py-2 text-sm
+             placeholder-slate-500 focus:outline-none focus:border-amber-400 transition mb-3"
+    />
+
+    <!-- Filters row 2: dropdowns -->
+    <div class="flex flex-wrap gap-2 mb-4">
       <select
         v-model="selectedCategory"
         class="bg-slate-900 border border-slate-600 text-white rounded-lg px-3 py-2 text-sm
-               focus:outline-none focus:border-amber-400 transition min-w-0 sm:w-56"
+               focus:outline-none focus:border-amber-400 transition flex-1 min-w-36"
       >
         <option value="">All Categories</option>
         <option v-for="cat in sortedCategories" :key="cat.id" :value="cat.id">
           {{ cat.name }}
         </option>
       </select>
+
       <select
         v-model="statusFilter"
         class="bg-slate-900 border border-slate-600 text-white rounded-lg px-3 py-2 text-sm
-               focus:outline-none focus:border-amber-400 transition sm:w-40"
+               focus:outline-none focus:border-amber-400 transition flex-1 min-w-32"
       >
         <option value="incomplete">Incomplete</option>
         <option value="all">All</option>
         <option value="done">Completed</option>
         <option value="inprogress">In Progress</option>
+      </select>
+
+      <select
+        v-model="typeFilter"
+        class="bg-slate-900 border border-slate-600 text-white rounded-lg px-3 py-2 text-sm
+               focus:outline-none focus:border-amber-400 transition flex-1 min-w-32"
+      >
+        <option value="all">All Types</option>
+        <option value="collections">Collections</option>
+        <option value="titles">Titles</option>
+        <option value="repeatable">Repeatable</option>
+      </select>
+
+      <select
+        v-model="sortBy"
+        class="bg-slate-900 border border-slate-600 text-white rounded-lg px-3 py-2 text-sm
+               focus:outline-none focus:border-amber-400 transition flex-1 min-w-36"
+      >
+        <option value="progress">Sort: Progress %</option>
+        <option value="ap-remaining">Sort: AP Remaining</option>
+        <option value="name">Sort: Name A–Z</option>
       </select>
     </div>
 
@@ -63,6 +87,14 @@
               <span v-if="item.category" class="text-xs bg-slate-600 text-amber-300 px-2 py-0.5 rounded-full">
                 {{ item.category.name }}
               </span>
+              <span v-if="item.detail.rewards?.some(r => r.type === 'Title')"
+                    class="text-xs bg-amber-900/40 text-amber-300 px-2 py-0.5 rounded-full">
+                🎖️ Title
+              </span>
+              <span v-if="item.account.repeated && item.account.repeated > 0"
+                    class="text-xs bg-sky-900/40 text-sky-300 px-2 py-0.5 rounded-full">
+                🔁 ×{{ item.account.repeated }}
+              </span>
             </div>
 
             <!-- Inline progress for in-progress -->
@@ -95,6 +127,17 @@
           <p v-if="item.detail.description" class="text-xs text-slate-400 mb-2">
             {{ item.detail.description }}
           </p>
+
+          <!-- Wiki link -->
+          <a
+            :href="wikiUrl(item.detail.name)"
+            target="_blank"
+            rel="noopener"
+            @click.stop
+            class="inline-flex items-center gap-1 text-xs text-amber-400 hover:text-amber-300 transition-colors mb-2"
+          >
+            📖 View on GW2 Wiki ↗
+          </a>
 
           <!-- Tiers -->
           <div v-if="item.detail.tiers.length > 1" class="mt-2">
@@ -219,18 +262,15 @@ const props = defineProps<{
 
 const search = ref(props.presetSearch ?? '')
 const selectedCategory = ref<number | ''>(props.presetCategory ?? '')
-
-watch(() => props.presetCategory, (val) => {
-  if (val !== undefined) selectedCategory.value = val
-})
-
-watch(() => props.presetSearch, (val) => {
-  if (val !== undefined) search.value = val
-})
 const statusFilter = ref<'all' | 'incomplete' | 'done' | 'inprogress'>('incomplete')
+const typeFilter = ref<'all' | 'collections' | 'titles' | 'repeatable'>('all')
+const sortBy = ref<'progress' | 'ap-remaining' | 'name'>('progress')
 const visibleCount = ref(50)
 const expanded = ref(new Set<number>())
 const copyFeedback = ref<number | null>(null)
+
+watch(() => props.presetCategory, (val) => { if (val !== undefined) selectedCategory.value = val })
+watch(() => props.presetSearch, (val) => { if (val !== undefined) search.value = val })
 
 const sortedCategories = computed(() =>
   [...props.categories].sort((a, b) => a.name.localeCompare(b.name))
@@ -238,17 +278,34 @@ const sortedCategories = computed(() =>
 
 const filtered = computed(() => {
   const q = search.value.toLowerCase().trim()
-  return props.achievements.filter(a => {
+  let results = props.achievements.filter(a => {
     if (q && !a.detail.name.toLowerCase().includes(q)) return false
     if (selectedCategory.value !== '' && a.category?.id !== selectedCategory.value) return false
     if (statusFilter.value === 'done' && !a.account.done) return false
     if (statusFilter.value === 'incomplete' && a.account.done) return false
     if (statusFilter.value === 'inprogress' && (a.account.done || (a.account.current ?? 0) === 0)) return false
+    if (typeFilter.value === 'collections' && !a.detail.bits?.some(b => b.type === 'Item' || b.type === 'Skin' || b.type === 'Minipet')) return false
+    if (typeFilter.value === 'titles' && !a.detail.rewards?.some(r => r.type === 'Title')) return false
+    if (typeFilter.value === 'repeatable' && !a.detail.flags?.includes('Repeatable') && !(a.account.repeated && a.account.repeated > 0)) return false
     return true
   })
+
+  if (sortBy.value === 'ap-remaining') {
+    results = [...results].sort((a, b) => (b.totalPoints - b.earnedPoints) - (a.totalPoints - a.earnedPoints))
+  } else if (sortBy.value === 'name') {
+    results = [...results].sort((a, b) => a.detail.name.localeCompare(b.detail.name))
+  } else {
+    results = [...results].sort((a, b) => b.progressPercent - a.progressPercent)
+  }
+
+  return results
 })
 
 const visible = computed(() => filtered.value.slice(0, visibleCount.value))
+
+function wikiUrl(name: string): string {
+  return `https://wiki.guildwars2.com/wiki/${encodeURIComponent(name.replace(/ /g, '_'))}`
+}
 
 function remainingBitsFor(item: EnrichedAchievement): AchievementBit[] {
   if (!item.detail.bits) return []
@@ -277,12 +334,10 @@ async function toggleExpand(item: EnrichedAchievement) {
     expanded.value.delete(id)
   } else {
     expanded.value.add(id)
-    // Kick off background resolution of bit names (non-blocking)
     if (item.detail.bits?.some(b => b.type !== 'Text' && b.id != null)) {
       props.resolveBitNames(item.detail.bits!)
     }
   }
-  // Trigger reactivity
   expanded.value = new Set(expanded.value)
 }
 
@@ -303,7 +358,7 @@ async function copyRemaining(item: EnrichedAchievement) {
     copyFeedback.value = item.account.id
     setTimeout(() => { copyFeedback.value = null }, 2000)
   } catch {
-    // Clipboard not available — silently ignore
+    // Clipboard not available
   }
 }
 </script>

@@ -147,6 +147,13 @@ export function useAchievements() {
       .sort((a, b) => b.progressPercent - a.progressPercent)
   )
 
+  const mostValuable = computed<EnrichedAchievement[]>(() =>
+    enrichedAchievements.value
+      .filter(a => !a.account.done && (a.totalPoints - a.earnedPoints) > 0)
+      .sort((a, b) => (b.totalPoints - b.earnedPoints) - (a.totalPoints - a.earnedPoints))
+      .slice(0, 20)
+  )
+
   async function loadData(key: string) {
     loading.value = true
     error.value = ''
@@ -191,7 +198,7 @@ export function useAchievements() {
   return {
     accountInfo, loading, error, loadingStage, savedKey,
     bitNamesCache, resolveBitNames,
-    enrichedAchievements, stats, categoryStats, almostDone, incomplete,
+    enrichedAchievements, stats, categoryStats, almostDone, incomplete, mostValuable,
     loadData, reset,
   }
 }

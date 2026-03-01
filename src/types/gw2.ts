@@ -43,7 +43,7 @@ export interface AchievementDetail {
   tiers: AchievementTier[]
   bits?: AchievementBit[]
   point_cap?: number
-  rewards?: unknown[]
+  rewards?: AchievementReward[]
   prerequisites?: number[]
 }
 
@@ -54,6 +54,13 @@ export interface AchievementCategory {
   order: number
   icon?: string
   achievements: number[]
+}
+
+export interface AchievementReward {
+  type: 'Coins' | 'Item' | 'Mastery' | 'Title'
+  id?: number
+  count?: number
+  region?: string
 }
 
 export interface ItemDetail { id: number; name: string }
