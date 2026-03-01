@@ -210,8 +210,8 @@ export function useAchievements() {
 
       // Upsert into saved accounts
       const idx = savedAccounts.value.findIndex(a => a.key === key)
-      if (idx >= 0) savedAccounts.value[idx].accountName = accountInfo.value!.name
-      else savedAccounts.value.push({ key, accountName: accountInfo.value.name })
+      if (idx >= 0) savedAccounts.value[idx]!.accountName = accountInfo.value!.name
+      else savedAccounts.value.push({ key, accountName: accountInfo.value!.name })
       persistAccounts()
       localStorage.setItem('gw2_last_key', key)
       savedKey.value = key
