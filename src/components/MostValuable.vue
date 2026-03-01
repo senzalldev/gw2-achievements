@@ -217,7 +217,7 @@ const FESTIVAL_KEYWORDS = [
   // Halloween
   'halloween', 'shadow of the mad king', 'blood and madness', 'lunatic wardrobe', 'mad king',
   // Lunar New Year
-  'lunar new year', "new year's customs", 'dragon ball',
+  'lunar new year', 'new year', 'dragon ball',
   // Dragon Bash
   'dragon bash',
   // Festival of the Four Winds / Bazaar
