@@ -70,7 +70,7 @@
             :in-progress="stats.inProgress"
             :not-started="stats.notStarted"
           />
-          <CategoryPointsChart :category-stats="categoryStats" />
+          <CategoryPointsChart :category-stats="categoryStats" @select="jumpToCategory" />
         </div>
         <!-- Quick-access cards for Almost Done and Most Valuable -->
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">

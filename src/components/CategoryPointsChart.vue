@@ -28,6 +28,7 @@
       </template>
     </p>
 
+    <p class="text-xs text-slate-500 mb-3">Click a bar to browse that category's achievements.</p>
     <div :style="{ height: chartHeight + 'px' }">
       <Bar :data="chartData" :options="chartOptions" />
     </div>
@@ -38,6 +39,7 @@
 import { ref, computed } from 'vue'
 import { Bar } from 'vue-chartjs'
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Tooltip } from 'chart.js'
+import type { ChartEvent, ActiveElement } from 'chart.js'
 import type { CategoryStats } from '../composables/useAchievements'
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip)
@@ -45,6 +47,8 @@ ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip)
 const props = defineProps<{
   categoryStats: CategoryStats[]
 }>()
+
+const emit = defineEmits<{ select: [catId: number] }>()
 
 const mode = ref<'potential' | 'earned'>('potential')
 const displayCount = 15
@@ -127,6 +131,17 @@ const chartOptions = computed(() => ({
   scales: {
     x: { stacked: true, ticks: { color: '#94a3b8' }, grid: { color: '#1e293b' } },
     y: { stacked: true, ticks: { color: '#cbd5e1', font: { size: 11 } }, grid: { display: false } },
+  },
+  onClick: (_event: ChartEvent, elements: ActiveElement[]) => {
+    const first = elements[0]
+    if (first != null) {
+      const cat = topCategories.value[first.index]
+      if (cat) emit('select', cat.category.id)
+    }
+  },
+  onHover: (event: ChartEvent, elements: ActiveElement[]) => {
+    const target = event.native?.target as HTMLCanvasElement | null
+    if (target) target.style.cursor = elements.length ? 'pointer' : 'default'
   },
 }))
 </script>
