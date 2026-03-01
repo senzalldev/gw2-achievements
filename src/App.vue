@@ -170,6 +170,8 @@
         <AchievementList
           :achievements="enrichedAchievements"
           :categories="allCategories"
+          :sorted-groups="sortedGroups"
+          :category-to-group="categoryToGroup"
           :preset-category="presetCategory"
           :preset-search="presetSearch"
           :preset-status="presetStatus"
@@ -211,6 +213,7 @@ const {
   accountInfo, loading, error, loadingStage, savedKey,
   bitNamesCache, resolveBitNames,
   enrichedAchievements, stats, categoryStats, almostDone, mostValuable,
+  categoryToGroup, sortedGroups,
   loadData, reset,
 } = useAchievements()
 

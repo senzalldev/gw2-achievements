@@ -20,7 +20,18 @@
     </div>
 
     <!-- Filters row 2: dropdowns -->
-    <div class="flex flex-wrap gap-2 mb-4">
+    <div class="flex flex-wrap gap-2 mb-2">
+      <select
+        v-model="groupFilter"
+        class="bg-slate-900 border border-slate-600 text-white rounded-lg px-3 py-2 text-sm
+               focus:outline-none focus:border-amber-400 transition flex-1 min-w-36"
+      >
+        <option value="">All Content</option>
+        <option v-for="g in props.sortedGroups" :key="g.id" :value="g.name">
+          {{ g.name }}
+        </option>
+      </select>
+
       <select
         v-model="selectedCategory"
         class="bg-slate-900 border border-slate-600 text-white rounded-lg px-3 py-2 text-sm
@@ -31,7 +42,9 @@
           {{ cat.name }}
         </option>
       </select>
+    </div>
 
+    <div class="flex flex-wrap gap-2 mb-4">
       <select
         v-model="statusFilter"
         class="bg-slate-900 border border-slate-600 text-white rounded-lg px-3 py-2 text-sm
@@ -270,15 +283,19 @@ import type { AchievementCategory, AchievementBit } from '../types/gw2'
 const props = defineProps<{
   achievements: EnrichedAchievement[]
   categories: AchievementCategory[]
+  sortedGroups: { id: string; name: string; order: number; categories: number[] }[]
+  categoryToGroup: Map<number, string>
   presetCategory?: number | ''
   presetSearch?: string
   presetStatus?: 'all' | 'incomplete' | 'done' | 'inprogress' | 'notstarted'
+  presetGroup?: string
   bitNamesCache: Map<string, string>
   resolveBitNames: (bits: AchievementBit[]) => Promise<void>
 }>()
 
 const search = ref(props.presetSearch ?? '')
 const selectedCategory = ref<number | ''>(props.presetCategory ?? '')
+const groupFilter = ref(props.presetGroup ?? '')
 const statusFilter = ref<'all' | 'incomplete' | 'done' | 'inprogress' | 'notstarted'>(props.presetStatus ?? 'incomplete')
 const typeFilter = ref<'all' | 'collections' | 'titles' | 'repeatable'>('all')
 const sortBy = ref<'progress' | 'ap-remaining' | 'name'>('progress')
@@ -289,6 +306,7 @@ const copyFeedback = ref<number | null>(null)
 watch(() => props.presetCategory, (val) => { if (val !== undefined) selectedCategory.value = val })
 watch(() => props.presetSearch, (val) => { if (val !== undefined) search.value = val })
 watch(() => props.presetStatus, (val) => { if (val !== undefined) statusFilter.value = val })
+watch(() => props.presetGroup, (val) => { if (val !== undefined) groupFilter.value = val ?? '' })
 
 const sortedCategories = computed(() =>
   [...props.categories].sort((a, b) => a.name.localeCompare(b.name))
@@ -298,6 +316,7 @@ const filtered = computed(() => {
   const q = search.value.toLowerCase().trim()
   let results = props.achievements.filter(a => {
     if (q && !a.detail.name.toLowerCase().includes(q)) return false
+    if (groupFilter.value && (a.category == null || props.categoryToGroup.get(a.category.id) !== groupFilter.value)) return false
     if (selectedCategory.value !== '' && a.category?.id !== selectedCategory.value) return false
     if (statusFilter.value === 'done' && !a.account.done) return false
     if (statusFilter.value === 'incomplete' && a.account.done) return false

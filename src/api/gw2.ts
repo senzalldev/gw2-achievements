@@ -1,4 +1,4 @@
-import type { AccountInfo, AccountAchievement, AchievementCategory, AchievementDetail, ItemDetail, SkinDetail, MiniDetail, WizardsVaultSection, Mastery, AccountMastery, MasteryPoints } from '../types/gw2'
+import type { AccountInfo, AccountAchievement, AchievementCategory, AchievementGroup, AchievementDetail, ItemDetail, SkinDetail, MiniDetail, WizardsVaultSection, Mastery, AccountMastery, MasteryPoints } from '../types/gw2'
 
 const BASE_URL = 'https://api.guildwars2.com/v2'
 
@@ -28,6 +28,10 @@ export async function getAccountAchievements(apiKey: string): Promise<AccountAch
 
 export async function getAchievementCategories(): Promise<AchievementCategory[]> {
   return apiFetch<AchievementCategory[]>('/achievements/categories?ids=all')
+}
+
+export async function getAchievementGroups(): Promise<AchievementGroup[]> {
+  return apiFetch<AchievementGroup[]>('/achievements/groups?ids=all')
 }
 
 export async function getAchievementDetails(ids: number[]): Promise<AchievementDetail[]> {

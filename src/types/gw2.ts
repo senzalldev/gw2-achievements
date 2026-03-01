@@ -63,6 +63,14 @@ export interface AchievementReward {
   region?: string
 }
 
+export interface AchievementGroup {
+  id: string
+  name: string
+  description: string
+  order: number
+  categories: number[]
+}
+
 export interface ItemDetail { id: number; name: string }
 export interface SkinDetail { id: number; name: string }
 export interface MiniDetail { id: number; name: string }

@@ -1,6 +1,6 @@
 import { ref, reactive, computed } from 'vue'
-import { validateKey, getAccountAchievements, getAchievementCategories, getAchievementDetails, resolveItems, resolveSkins, resolveMinis } from '../api/gw2'
-import type { AccountInfo, AccountAchievement, AchievementCategory, AchievementDetail, AchievementBit } from '../types/gw2'
+import { validateKey, getAccountAchievements, getAchievementCategories, getAchievementGroups, getAchievementDetails, resolveItems, resolveSkins, resolveMinis } from '../api/gw2'
+import type { AccountInfo, AccountAchievement, AchievementCategory, AchievementGroup, AchievementDetail, AchievementBit } from '../types/gw2'
 
 export interface EnrichedAchievement {
   account: AccountAchievement
@@ -86,6 +86,7 @@ export function useAchievements() {
 
   const accountAchievements = ref<AccountAchievement[]>([])
   const categories = ref<AchievementCategory[]>([])
+  const groups = ref<AchievementGroup[]>([])
   const detailsMap = ref(new Map<number, AchievementDetail>())
 
   // Map achievement ID -> category
@@ -96,6 +97,21 @@ export function useAchievements() {
     }
     return map
   })
+
+  // Map category ID -> group name (sorted by group order for dropdown use)
+  const categoryToGroup = computed(() => {
+    const map = new Map<number, string>()
+    const sorted = [...groups.value].sort((a, b) => a.order - b.order)
+    for (const group of sorted) {
+      for (const catId of group.categories) map.set(catId, group.name)
+    }
+    return map
+  })
+
+  // Groups sorted by order, for building filter dropdowns
+  const sortedGroups = computed(() =>
+    [...groups.value].sort((a, b) => a.order - b.order)
+  )
 
   const enrichedAchievements = computed<EnrichedAchievement[]>(() => {
     return accountAchievements.value
@@ -175,9 +191,10 @@ export function useAchievements() {
       savedKey.value = key
 
       loadingStage.value = "Fetching your hero's journey..."
-      const [acct, cats] = await Promise.all([getAccountAchievements(key), getAchievementCategories()])
+      const [acct, cats, grps] = await Promise.all([getAccountAchievements(key), getAchievementCategories(), getAchievementGroups()])
       accountAchievements.value = acct
       categories.value = cats
+      groups.value = grps
 
       loadingStage.value = `Loading details for ${acct.length.toLocaleString()} achievements...`
       const details = await getAchievementDetails(acct.map(a => a.id))
@@ -207,6 +224,7 @@ export function useAchievements() {
     accountInfo, loading, error, loadingStage, savedKey,
     bitNamesCache, resolveBitNames,
     enrichedAchievements, stats, categoryStats, almostDone, incomplete, mostValuable,
+    categoryToGroup, sortedGroups,
     loadData, reset,
   }
 }
