@@ -281,7 +281,7 @@
         <span>v{{ APP_VERSION }}</span>
         <span>·</span>
         <a href="https://senzall.com" target="_blank" rel="noopener"
-           class="text-amber-900 hover:text-amber-600 transition-colors">senzall.com</a>
+           class="text-amber-700 hover:text-amber-400 transition-colors">senzall.com</a>
       </footer>
 
     </main>
