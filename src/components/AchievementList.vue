@@ -41,6 +41,7 @@
         <option value="all">All</option>
         <option value="done">Completed</option>
         <option value="inprogress">In Progress</option>
+        <option value="notstarted">Not Started</option>
       </select>
 
       <select
@@ -271,13 +272,14 @@ const props = defineProps<{
   categories: AchievementCategory[]
   presetCategory?: number | ''
   presetSearch?: string
+  presetStatus?: 'all' | 'incomplete' | 'done' | 'inprogress' | 'notstarted'
   bitNamesCache: Map<string, string>
   resolveBitNames: (bits: AchievementBit[]) => Promise<void>
 }>()
 
 const search = ref(props.presetSearch ?? '')
 const selectedCategory = ref<number | ''>(props.presetCategory ?? '')
-const statusFilter = ref<'all' | 'incomplete' | 'done' | 'inprogress'>('incomplete')
+const statusFilter = ref<'all' | 'incomplete' | 'done' | 'inprogress' | 'notstarted'>(props.presetStatus ?? 'incomplete')
 const typeFilter = ref<'all' | 'collections' | 'titles' | 'repeatable'>('all')
 const sortBy = ref<'progress' | 'ap-remaining' | 'name'>('progress')
 const visibleCount = ref(50)
@@ -286,6 +288,7 @@ const copyFeedback = ref<number | null>(null)
 
 watch(() => props.presetCategory, (val) => { if (val !== undefined) selectedCategory.value = val })
 watch(() => props.presetSearch, (val) => { if (val !== undefined) search.value = val })
+watch(() => props.presetStatus, (val) => { if (val !== undefined) statusFilter.value = val })
 
 const sortedCategories = computed(() =>
   [...props.categories].sort((a, b) => a.name.localeCompare(b.name))
@@ -299,6 +302,7 @@ const filtered = computed(() => {
     if (statusFilter.value === 'done' && !a.account.done) return false
     if (statusFilter.value === 'incomplete' && a.account.done) return false
     if (statusFilter.value === 'inprogress' && (a.account.done || (a.account.current ?? 0) === 0)) return false
+    if (statusFilter.value === 'notstarted' && (a.account.done || (a.account.current ?? 0) > 0)) return false
     if (typeFilter.value === 'collections' && !a.detail.bits?.some(b => b.type === 'Item' || b.type === 'Skin' || b.type === 'Minipet')) return false
     if (typeFilter.value === 'titles' && !a.detail.rewards?.some(r => r.type === 'Title')) return false
     if (typeFilter.value === 'repeatable' && !a.detail.flags?.includes('Repeatable') && !(a.account.repeated && a.account.repeated > 0)) return false

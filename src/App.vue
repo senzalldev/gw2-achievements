@@ -69,6 +69,7 @@
             :done="stats.done"
             :in-progress="stats.inProgress"
             :not-started="stats.notStarted"
+            @select="jumpToStatus"
           />
           <CategoryPointsChart :category-stats="categoryStats" @select="jumpToCategory" />
         </div>
@@ -171,6 +172,7 @@
           :categories="allCategories"
           :preset-category="presetCategory"
           :preset-search="presetSearch"
+          :preset-status="presetStatus"
           :bit-names-cache="bitNamesCache"
           :resolve-bit-names="resolveBitNames"
         />
@@ -217,6 +219,7 @@ const allCategories = computed(() => categoryStats.value.map(cs => cs.category))
 const activeTab = ref<'overview' | 'almostdone' | 'mostvaluable' | 'goals' | 'categories' | 'browse' | 'daily' | 'masteries'>('overview')
 const presetCategory = ref<number | ''>('')
 const presetSearch = ref('')
+const presetStatus = ref<'all' | 'incomplete' | 'done' | 'inprogress' | 'notstarted' | undefined>(undefined)
 const categorySearch = ref('')
 
 const filteredCategoryStats = computed(() => {
@@ -243,6 +246,14 @@ function catCompletionPct(cat: CategoryStats): number {
 function jumpToCategory(catId: number) {
   presetCategory.value = catId
   presetSearch.value = ''
+  presetStatus.value = undefined
+  activeTab.value = 'browse'
+}
+
+function jumpToStatus(status: 'done' | 'inprogress' | 'notstarted') {
+  presetCategory.value = ''
+  presetSearch.value = ''
+  presetStatus.value = status
   activeTab.value = 'browse'
 }
 

@@ -1,6 +1,7 @@
 <template>
   <div class="bg-slate-800 rounded-xl p-5 border border-slate-700">
     <h3 class="font-semibold text-white mb-4">Achievement Status</h3>
+    <p class="text-xs text-slate-500 mb-3">Click a segment to browse those achievements.</p>
     <div class="h-56">
       <Doughnut :data="chartData" :options="chartOptions" />
     </div>
@@ -16,6 +17,7 @@
 import { computed } from 'vue'
 import { Doughnut } from 'vue-chartjs'
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js'
+import type { ChartEvent, ActiveElement } from 'chart.js'
 
 ChartJS.register(ArcElement, Tooltip, Legend)
 
@@ -24,6 +26,10 @@ const props = defineProps<{
   inProgress: number
   notStarted: number
 }>()
+
+const emit = defineEmits<{ select: [status: 'done' | 'inprogress' | 'notstarted'] }>()
+
+const statusMap = ['done', 'inprogress', 'notstarted'] as const
 
 const chartData = computed(() => ({
   labels: ['Completed', 'In Progress', 'Not Started'],
@@ -35,7 +41,7 @@ const chartData = computed(() => ({
   }],
 }))
 
-const chartOptions = {
+const chartOptions = computed(() => ({
   responsive: true,
   maintainAspectRatio: false,
   plugins: {
@@ -50,5 +56,16 @@ const chartOptions = {
       },
     },
   },
-}
+  onClick: (_event: ChartEvent, elements: ActiveElement[]) => {
+    const first = elements[0]
+    if (first != null) {
+      const status = statusMap[first.index]
+      if (status) emit('select', status)
+    }
+  },
+  onHover: (event: ChartEvent, elements: ActiveElement[]) => {
+    const target = event.native?.target as HTMLCanvasElement | null
+    if (target) target.style.cursor = elements.length ? 'pointer' : 'default'
+  },
+}))
 </script>
