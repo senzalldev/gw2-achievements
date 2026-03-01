@@ -1,0 +1,158 @@
+<template>
+  <!-- Not loaded yet: show key input -->
+  <div v-if="!accountInfo && !loading" class="min-h-screen bg-slate-900">
+    <ApiKeyInput
+      :loading="loading"
+      :loading-stage="loadingStage"
+      :error="error"
+      @submit="loadData"
+    />
+  </div>
+
+  <!-- Loading spinner -->
+  <div v-else-if="loading" class="min-h-screen bg-slate-900 flex items-center justify-center">
+    <div class="text-center">
+      <div class="text-5xl mb-4 animate-spin">⚙️</div>
+      <p class="text-amber-400 font-semibold text-lg">{{ loadingStage }}</p>
+      <p class="text-slate-500 text-sm mt-1">This may take a moment for large accounts...</p>
+    </div>
+  </div>
+
+  <!-- Dashboard -->
+  <div v-else class="min-h-screen bg-slate-900 text-white">
+    <!-- Header -->
+    <header class="bg-slate-800 border-b border-slate-700 px-6 py-4">
+      <div class="max-w-7xl mx-auto flex items-center justify-between flex-wrap gap-3">
+        <div>
+          <h1 class="text-xl font-bold text-amber-400">⚔️ GW2 Achievement Tracker</h1>
+          <p class="text-sm text-slate-400">
+            {{ accountInfo?.name }}
+            <span class="text-slate-600 mx-1">·</span>
+            <span class="text-slate-500">{{ stats.total.toLocaleString() }} achievements tracked</span>
+          </p>
+        </div>
+        <button
+          @click="reset"
+          class="text-sm text-slate-400 hover:text-white border border-slate-600 hover:border-slate-400 px-3 py-1.5 rounded-lg transition-colors"
+        >
+          Switch Account
+        </button>
+      </div>
+    </header>
+
+    <!-- Tab nav -->
+    <nav class="bg-slate-800/50 border-b border-slate-700/50 px-6">
+      <div class="max-w-7xl mx-auto flex gap-1">
+        <button
+          v-for="tab in tabs"
+          :key="tab.id"
+          @click="activeTab = tab.id"
+          class="px-4 py-3 text-sm font-medium border-b-2 transition-colors"
+          :class="activeTab === tab.id
+            ? 'border-amber-400 text-amber-400'
+            : 'border-transparent text-slate-400 hover:text-slate-200'"
+        >
+          {{ tab.label }}
+        </button>
+      </div>
+    </nav>
+
+    <!-- Main content -->
+    <main class="max-w-7xl mx-auto px-6 py-6 space-y-6">
+
+      <!-- Overview tab -->
+      <template v-if="activeTab === 'overview'">
+        <StatsCards :stats="stats" />
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <StatusDonut
+            :done="stats.done"
+            :in-progress="stats.inProgress"
+            :not-started="stats.notStarted"
+          />
+          <CategoryPointsChart :category-stats="categoryStats" />
+        </div>
+        <AlmostDone :items="almostDone" />
+      </template>
+
+      <!-- Categories tab -->
+      <template v-if="activeTab === 'categories'">
+        <div class="bg-slate-800 rounded-xl p-5 border border-slate-700">
+          <h3 class="font-semibold text-white mb-1">Category Breakdown</h3>
+          <p class="text-xs text-slate-500 mb-4">Click a category to browse its achievements</p>
+          <div class="space-y-3">
+            <div
+              v-for="cat in categoryStats"
+              :key="cat.category.id"
+              class="bg-slate-700/40 rounded-lg p-4 hover:bg-slate-700/70 transition-colors cursor-pointer"
+              @click="jumpToCategory(cat.category.id)"
+            >
+              <div class="flex items-center justify-between mb-2 flex-wrap gap-2">
+                <span class="font-medium text-white">{{ cat.category.name }}</span>
+                <div class="flex items-center gap-4 text-sm">
+                  <span class="text-emerald-400">{{ cat.done }} done</span>
+                  <span v-if="cat.inProgress > 0" class="text-amber-400">{{ cat.inProgress }} in progress</span>
+                  <span class="text-purple-400">{{ cat.earnedPoints }} / {{ cat.totalPoints }} AP</span>
+                </div>
+              </div>
+              <div class="w-full bg-slate-600 rounded-full h-2">
+                <div
+                  class="h-2 rounded-full bg-gradient-to-r from-amber-500 to-amber-400"
+                  :style="{ width: catCompletionPct(cat) + '%' }"
+                ></div>
+              </div>
+              <div class="text-xs text-slate-500 mt-1">{{ catCompletionPct(cat) }}% of AP earned</div>
+            </div>
+          </div>
+        </div>
+      </template>
+
+      <!-- Browse tab -->
+      <template v-if="activeTab === 'browse'">
+        <AchievementList
+          :achievements="enrichedAchievements"
+          :categories="allCategories"
+          :preset-category="presetCategory"
+        />
+      </template>
+
+    </main>
+  </div>
+</template>
+
+<script setup lang="ts">
+import { ref, computed } from 'vue'
+import { useAchievements } from './composables/useAchievements'
+import type { CategoryStats } from './composables/useAchievements'
+import ApiKeyInput from './components/ApiKeyInput.vue'
+import StatsCards from './components/StatsCards.vue'
+import StatusDonut from './components/StatusDonut.vue'
+import CategoryPointsChart from './components/CategoryPointsChart.vue'
+import AlmostDone from './components/AlmostDone.vue'
+import AchievementList from './components/AchievementList.vue'
+
+const {
+  accountInfo, loading, error, loadingStage,
+  enrichedAchievements, stats, categoryStats, almostDone,
+  loadData, reset,
+} = useAchievements()
+
+const allCategories = computed(() => categoryStats.value.map(cs => cs.category))
+
+const activeTab = ref<'overview' | 'categories' | 'browse'>('overview')
+const presetCategory = ref<number | ''>('')
+
+const tabs = [
+  { id: 'overview' as const, label: 'Overview' },
+  { id: 'categories' as const, label: 'Categories' },
+  { id: 'browse' as const, label: 'Browse All' },
+]
+
+function catCompletionPct(cat: CategoryStats): number {
+  return cat.totalPoints > 0 ? Math.round((cat.earnedPoints / cat.totalPoints) * 100) : 0
+}
+
+function jumpToCategory(catId: number) {
+  presetCategory.value = catId
+  activeTab.value = 'browse'
+}
+</script>
