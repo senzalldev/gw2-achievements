@@ -29,16 +29,26 @@
         <div>
           <div class="flex items-center gap-2">
             <h1 class="text-xl font-bold text-amber-400">⚔️ GW2 Achievement Tracker</h1>
-            <a href="https://senzall.com" target="_blank" rel="noopener"
-               class="text-xs text-slate-600 hover:text-slate-400 transition-colors hidden sm:block">
-              senzall.com ↗
-            </a>
           </div>
           <p class="text-sm text-slate-400">
             {{ accountInfo?.name }}
             <span class="text-slate-600 mx-1">·</span>
             <span class="text-slate-500">{{ stats.total.toLocaleString() }} achievements tracked</span>
           </p>
+        </div>
+
+        <!-- Header links -->
+        <div class="flex items-center gap-2">
+          <a href="https://senzall.com/ltmessages" target="_blank" rel="noopener"
+             class="text-sm text-slate-400 hover:text-white border border-slate-600 hover:border-slate-400
+                    px-3 py-1.5 rounded-lg transition-colors hidden sm:flex items-center gap-1.5">
+            💬 LT Messages
+          </a>
+          <a href="https://senzall.com" target="_blank" rel="noopener"
+             class="text-sm text-amber-500 hover:text-amber-400 border border-amber-800 hover:border-amber-600
+                    px-3 py-1.5 rounded-lg transition-colors hidden sm:flex items-center gap-1.5">
+            senzall.com ↗
+          </a>
         </div>
 
         <!-- Accounts dropdown -->
