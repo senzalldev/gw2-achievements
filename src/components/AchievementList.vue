@@ -79,16 +79,25 @@
       </select>
     </div>
 
-    <!-- Count + collapse all -->
-    <div class="flex items-center justify-between mb-3">
+    <!-- Count + clear filters + collapse all -->
+    <div class="flex items-center justify-between mb-3 gap-2 flex-wrap">
       <div class="text-xs text-slate-500">Showing {{ visible.length }} of {{ filtered.length }} achievements</div>
-      <button
-        v-if="expanded.size > 0"
-        @click="expanded = new Set()"
-        class="text-xs text-slate-500 hover:text-slate-300 transition-colors"
-      >
-        Collapse all
-      </button>
+      <div class="flex items-center gap-3">
+        <button
+          v-if="isFiltered"
+          @click="clearFilters"
+          class="text-xs text-amber-400 hover:text-amber-300 transition-colors"
+        >
+          ✕ Clear filters
+        </button>
+        <button
+          v-if="expanded.size > 0"
+          @click="expanded = new Set()"
+          class="text-xs text-slate-500 hover:text-slate-300 transition-colors"
+        >
+          Collapse all
+        </button>
+      </div>
     </div>
 
     <!-- List -->
@@ -311,6 +320,22 @@ watch(() => props.presetGroup, (val) => { if (val !== undefined) groupFilter.val
 const sortedCategories = computed(() =>
   [...props.categories].sort((a, b) => a.name.localeCompare(b.name))
 )
+
+const isFiltered = computed(() =>
+  search.value !== '' ||
+  selectedCategory.value !== '' ||
+  groupFilter.value !== '' ||
+  statusFilter.value !== 'incomplete' ||
+  typeFilter.value !== 'all'
+)
+
+function clearFilters() {
+  search.value = ''
+  selectedCategory.value = ''
+  groupFilter.value = ''
+  statusFilter.value = 'incomplete'
+  typeFilter.value = 'all'
+}
 
 const filtered = computed(() => {
   const q = search.value.toLowerCase().trim()
