@@ -20,8 +20,16 @@ export interface CategoryStats {
 }
 
 function calculateEarnedPoints(account: AccountAchievement, detail: AchievementDetail): number {
+  const apPerCompletion = detail.tiers.reduce((s, t) => s + t.points, 0)
+
+  // Repeatable achievements with a cap: AP comes from all completed cycles, not just the current one
+  if (detail.point_cap != null && detail.flags?.includes('Repeatable')) {
+    const timesCompleted = (account.repeated ?? 0) + (account.done ? 1 : 0)
+    return Math.min(timesCompleted * apPerCompletion, detail.point_cap)
+  }
+
   if (account.done) {
-    return detail.point_cap ?? detail.tiers.reduce((s, t) => s + t.points, 0)
+    return detail.point_cap ?? apPerCompletion
   }
   const current = account.current ?? 0
   let earned = 0
@@ -29,7 +37,7 @@ function calculateEarnedPoints(account: AccountAchievement, detail: AchievementD
     if (current >= tier.count) earned += tier.points
     else break
   }
-  return earned
+  return Math.min(earned, detail.point_cap ?? earned)
 }
 
 function calculateTotalPoints(detail: AchievementDetail): number {

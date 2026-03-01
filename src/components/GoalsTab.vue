@@ -250,7 +250,7 @@ const skinAchievements = computed(() =>
 
 const repeatableAchievements = computed(() =>
   props.achievements
-    .filter(a => a.detail.flags?.includes('Repeatable') && !a.account.done)
+    .filter(a => a.detail.flags?.includes('Repeatable') && !a.account.done && (a.totalPoints - a.earnedPoints) > 0)
     .sort((a, b) => (b.totalPoints - b.earnedPoints) - (a.totalPoints - a.earnedPoints))
 )
 
