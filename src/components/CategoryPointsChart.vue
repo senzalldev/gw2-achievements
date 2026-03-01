@@ -65,10 +65,21 @@ const excludeFestivals = ref(false)
 const displayCount = 15
 
 const FESTIVAL_KEYWORDS = [
-  'wintersday', 'halloween', 'shadow of the mad king', 'blood and madness',
-  'lunar new year', "new year's customs", 'dragon bash', 'festival of the four winds',
-  'bazaar of the four winds', 'super adventure', 'seasonal activities',
-  'toymaker tixx', 'mad king',
+  // Wintersday
+  'wintersday', "winter's presence", 'toymaker tixx',
+  // Halloween
+  'halloween', 'shadow of the mad king', 'blood and madness', 'lunatic wardrobe', 'mad king',
+  // Lunar New Year
+  'lunar new year', "new year's customs", 'dragon ball',
+  // Dragon Bash
+  'dragon bash',
+  // Festival of the Four Winds / Bazaar
+  'festival of the four winds', 'bazaar of the four winds', 'four winds customs',
+  'crown pavilion', "queen's gauntlet",
+  // Super Adventure Festival
+  'super adventure',
+  // Generic
+  'seasonal activities',
 ]
 
 function isFestivalCategory(name: string): boolean {
