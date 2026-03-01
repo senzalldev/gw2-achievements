@@ -195,7 +195,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import type { EnrichedAchievement } from '../composables/useAchievements'
 import type { AchievementBit } from '../types/gw2'
 
@@ -209,7 +209,8 @@ defineEmits<{ select: [item: EnrichedAchievement] }>()
 
 const expanded = ref(new Set<number>())
 const copyFeedback = ref<number | null>(null)
-const excludeFestivals = ref(false)
+const excludeFestivals = ref(localStorage.getItem('gw2_hide_festivals') === '1')
+watch(excludeFestivals, v => localStorage.setItem('gw2_hide_festivals', v ? '1' : '0'))
 
 const FESTIVAL_KEYWORDS = [
   // Wintersday

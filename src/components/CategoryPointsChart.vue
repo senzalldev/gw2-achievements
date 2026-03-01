@@ -46,7 +46,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { Bar } from 'vue-chartjs'
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Tooltip } from 'chart.js'
 import type { ChartEvent, ActiveElement } from 'chart.js'
@@ -61,7 +61,8 @@ const props = defineProps<{
 const emit = defineEmits<{ select: [catId: number] }>()
 
 const mode = ref<'potential' | 'earned'>('potential')
-const excludeFestivals = ref(false)
+const excludeFestivals = ref(localStorage.getItem('gw2_hide_festivals') === '1')
+watch(excludeFestivals, v => localStorage.setItem('gw2_hide_festivals', v ? '1' : '0'))
 const displayCount = 15
 
 const FESTIVAL_KEYWORDS = [
