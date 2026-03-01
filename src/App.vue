@@ -64,17 +64,9 @@
       <!-- Overview tab -->
       <template v-if="activeTab === 'overview'">
         <StatsCards :stats="stats" />
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <StatusDonut
-            :done="stats.done"
-            :in-progress="stats.inProgress"
-            :not-started="stats.notStarted"
-            @select="jumpToStatus"
-          />
-          <CategoryPointsChart :category-stats="categoryStats" @select="jumpToCategory" />
-        </div>
-        <!-- Quick-access cards for Almost Done and Most Valuable -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+        <!-- Quick-access cards — above charts so they're immediately visible -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <button
             @click="activeTab = 'almostdone'"
             class="bg-slate-800 border border-slate-700 rounded-xl p-5 text-left hover:border-amber-400/40 transition-colors group"
@@ -91,6 +83,25 @@
             <div class="font-semibold text-white group-hover:text-purple-300 transition-colors">Most Valuable</div>
             <div class="text-xs text-slate-400 mt-1">{{ mostValuable.length }} achievements with the most AP left</div>
           </button>
+          <button
+            @click="activeTab = 'about'"
+            class="bg-slate-800 border border-slate-700 rounded-xl p-5 text-left hover:border-slate-500/60 transition-colors group"
+          >
+            <div class="text-2xl mb-2">ℹ️</div>
+            <div class="font-semibold text-white group-hover:text-slate-300 transition-colors">About</div>
+            <div class="text-xs text-slate-400 mt-1">Tech stack, privacy, API key info & credits</div>
+          </button>
+        </div>
+
+        <!-- Charts -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <StatusDonut
+            :done="stats.done"
+            :in-progress="stats.inProgress"
+            :not-started="stats.notStarted"
+            @select="jumpToStatus"
+          />
+          <CategoryPointsChart :category-stats="categoryStats" @select="jumpToCategory" />
         </div>
       </template>
 
@@ -190,6 +201,11 @@
         <MasteryProgress :api-key="savedKey" />
       </template>
 
+      <!-- About tab -->
+      <template v-if="activeTab === 'about'">
+        <AboutTab />
+      </template>
+
     </main>
   </div>
 </template>
@@ -208,6 +224,7 @@ import GoalsTab from './components/GoalsTab.vue'
 import AchievementList from './components/AchievementList.vue'
 import DailyAchievements from './components/DailyAchievements.vue'
 import MasteryProgress from './components/MasteryProgress.vue'
+import AboutTab from './components/AboutTab.vue'
 
 const {
   accountInfo, loading, error, loadingStage, savedKey,
@@ -219,7 +236,7 @@ const {
 
 const allCategories = computed(() => categoryStats.value.map(cs => cs.category))
 
-const activeTab = ref<'overview' | 'almostdone' | 'mostvaluable' | 'goals' | 'categories' | 'browse' | 'daily' | 'masteries'>('overview')
+const activeTab = ref<'overview' | 'almostdone' | 'mostvaluable' | 'goals' | 'categories' | 'browse' | 'daily' | 'masteries' | 'about'>('overview')
 const presetCategory = ref<number | ''>('')
 const presetSearch = ref('')
 const presetStatus = ref<'all' | 'incomplete' | 'done' | 'inprogress' | 'notstarted' | undefined>(undefined)
@@ -240,6 +257,7 @@ const tabs = [
   { id: 'browse' as const, label: 'Browse All' },
   { id: 'daily' as const, label: 'Daily' },
   { id: 'masteries' as const, label: 'Masteries' },
+  { id: 'about' as const, label: 'About' },
 ]
 
 function catCompletionPct(cat: CategoryStats): number {

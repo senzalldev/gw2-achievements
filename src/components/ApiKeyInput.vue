@@ -1,6 +1,6 @@
 <template>
   <div class="min-h-screen bg-slate-900 flex items-center justify-center p-4">
-    <div class="w-full max-w-lg">
+    <div class="w-full max-w-xl">
       <!-- Logo / Title -->
       <div class="text-center mb-8">
         <div class="text-6xl mb-3">⚔️</div>
@@ -63,12 +63,37 @@
           It is never sent to any other server.
         </p>
       </div>
+
+      <!-- Feature highlights -->
+      <div class="mt-6 grid grid-cols-2 sm:grid-cols-3 gap-3">
+        <div
+          v-for="f in features"
+          :key="f.label"
+          class="bg-slate-800/50 border border-slate-700/50 rounded-xl p-3"
+        >
+          <div class="text-xl mb-1">{{ f.icon }}</div>
+          <div class="text-sm font-medium text-slate-300">{{ f.label }}</div>
+          <div class="text-xs text-slate-500 mt-0.5">{{ f.desc }}</div>
+        </div>
+      </div>
+      <p class="mt-4 text-xs text-slate-600 text-center">
+        Zero backend · No account · Data stays in your browser
+      </p>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue'
+
+const features = [
+  { icon: '📊', label: 'Overview',      desc: 'AP progress charts & category breakdown' },
+  { icon: '🏃', label: 'Almost Done',   desc: 'Achievements closest to completion' },
+  { icon: '💎', label: 'Most Valuable', desc: 'Most AP still on the table' },
+  { icon: '🌟', label: 'Goals',         desc: 'Masteries, titles & skins' },
+  { icon: '📅', label: 'Daily',         desc: "Today's Wizard's Vault tasks" },
+  { icon: '🔍', label: 'Browse All',    desc: 'Full list with Raids, Fractals & more' },
+]
 
 const props = defineProps<{
   loading: boolean
