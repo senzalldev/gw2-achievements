@@ -12,7 +12,7 @@
       <div class="bg-slate-800 rounded-2xl p-8 shadow-2xl border border-slate-700">
 
         <!-- Saved accounts view -->
-        <template v-if="!showAddForm && props.savedAccounts.length > 0">
+        <template v-if="!showAddForm && (props.savedAccounts?.length ?? 0) > 0">
           <h2 class="text-lg font-semibold text-white mb-1">Your accounts</h2>
           <p class="text-sm text-slate-400 mb-5">Select an account to load, or add a new one.</p>
 
@@ -90,7 +90,7 @@
           </form>
 
           <button
-            v-if="props.savedAccounts.length > 0"
+            v-if="(props.savedAccounts?.length ?? 0) > 0"
             type="button"
             @click="showAddForm = false"
             class="mt-3 text-xs text-slate-500 hover:text-slate-300 transition-colors"
