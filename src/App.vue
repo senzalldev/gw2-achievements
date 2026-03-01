@@ -87,7 +87,7 @@
           <div v-if="accountsOpen" @click="accountsOpen = false" class="fixed inset-0 z-40" />
         </div>
 
-        <a href="https://senzall.com" target="_blank" rel="noopener"
+        <a href="https://senzall.com" target="senzall" rel="noopener"
            class="text-sm text-amber-500 hover:text-amber-400 border border-amber-800 hover:border-amber-600
                   px-3 py-1.5 rounded-lg transition-colors hidden sm:flex items-center gap-1.5">
           senzall.com ↗
@@ -281,7 +281,7 @@
           <span>·</span>
           <span>v{{ APP_VERSION }}</span>
           <span>·</span>
-          <a href="https://senzall.com" target="_blank" rel="noopener"
+          <a href="https://senzall.com" target="senzall" rel="noopener"
              class="text-amber-700 hover:text-amber-400 transition-colors">senzall.com</a>
         </div>
         <div class="text-slate-700">Not affiliated with ArenaNet or NCSoft. Guild Wars 2 © ArenaNet, LLC.</div>
