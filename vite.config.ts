@@ -7,5 +7,5 @@ export default defineConfig({
     vue(),
     tailwindcss(),
   ],
-  base: '/gw2-achievements/',
+  base: '/',
 })
