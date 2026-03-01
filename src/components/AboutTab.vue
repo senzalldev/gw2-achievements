@@ -164,14 +164,8 @@
         has made your squad comms a little smoother,
         buying me a coffee is the real-world equivalent of tipping a helpful guildie.
       </p>
-      <a
-        href="https://ko-fi.com/senzall"
-        target="_blank"
-        rel="noopener"
-        class="inline-flex items-center gap-2 bg-amber-500 hover:bg-amber-400 text-slate-900
-               font-semibold text-sm px-5 py-2.5 rounded-lg transition-colors"
-      >
-        ☕ Buy me a coffee
+      <a href='https://ko-fi.com/H2H31V753H' target='_blank' rel="noopener">
+        <img height='40' style='border:0px;height:40px;' src='/support_me_on_kofi_dark.png' alt='Support me on Ko-fi' />
       </a>
     </div>
 
