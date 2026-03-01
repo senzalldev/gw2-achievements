@@ -1,6 +1,6 @@
-import { ref, computed } from 'vue'
-import { validateKey, getAccountAchievements, getAchievementCategories, getAchievementDetails } from '../api/gw2'
-import type { AccountInfo, AccountAchievement, AchievementCategory, AchievementDetail } from '../types/gw2'
+import { ref, reactive, computed } from 'vue'
+import { validateKey, getAccountAchievements, getAchievementCategories, getAchievementDetails, resolveItems, resolveSkins, resolveMinis } from '../api/gw2'
+import type { AccountInfo, AccountAchievement, AchievementCategory, AchievementDetail, AchievementBit } from '../types/gw2'
 
 export interface EnrichedAchievement {
   account: AccountAchievement
@@ -36,11 +36,45 @@ function calculateTotalPoints(detail: AchievementDetail): number {
   return detail.point_cap ?? detail.tiers.reduce((s, t) => s + t.points, 0)
 }
 
+// Shared bit name cache — persists for the lifetime of the page
+const bitNamesCache = reactive(new Map<string, string>())
+
+async function resolveBitNames(bits: AchievementBit[]): Promise<void> {
+  const itemIds: number[] = []
+  const skinIds: number[] = []
+  const miniIds: number[] = []
+
+  for (const bit of bits) {
+    if (bit.id == null) continue
+    const cacheKey = `${bit.type.toLowerCase()}:${bit.id}`
+    if (bitNamesCache.has(cacheKey)) continue
+    if (bit.type === 'Item') itemIds.push(bit.id)
+    else if (bit.type === 'Skin') skinIds.push(bit.id)
+    else if (bit.type === 'Minipet') miniIds.push(bit.id)
+  }
+
+  if (itemIds.length + skinIds.length + miniIds.length === 0) return
+
+  try {
+    const [items, skins, minis] = await Promise.all([
+      resolveItems(itemIds),
+      resolveSkins(skinIds),
+      resolveMinis(miniIds),
+    ])
+    for (const [id, name] of items) bitNamesCache.set(`item:${id}`, name)
+    for (const [id, name] of skins) bitNamesCache.set(`skin:${id}`, name)
+    for (const [id, name] of minis) bitNamesCache.set(`minipet:${id}`, name)
+  } catch {
+    // Silently ignore — bit names fall back to ID labels
+  }
+}
+
 export function useAchievements() {
   const accountInfo = ref<AccountInfo | null>(null)
   const loading = ref(false)
   const error = ref('')
   const loadingStage = ref('')
+  const savedKey = ref(localStorage.getItem('gw2_api_key') ?? '')
 
   const accountAchievements = ref<AccountAchievement[]>([])
   const categories = ref<AchievementCategory[]>([])
@@ -118,10 +152,14 @@ export function useAchievements() {
     error.value = ''
 
     try {
-      loadingStage.value = 'Validating API key...'
+      loadingStage.value = "Checking your tracker key..."
       accountInfo.value = await validateKey(key)
 
-      loadingStage.value = 'Fetching your achievements and categories...'
+      // Persist the validated key
+      localStorage.setItem('gw2_api_key', key)
+      savedKey.value = key
+
+      loadingStage.value = "Fetching your hero's journey..."
       const [acct, cats] = await Promise.all([getAccountAchievements(key), getAchievementCategories()])
       accountAchievements.value = acct
       categories.value = cats
@@ -146,10 +184,13 @@ export function useAchievements() {
     categories.value = []
     detailsMap.value = new Map()
     error.value = ''
+    localStorage.removeItem('gw2_api_key')
+    savedKey.value = ''
   }
 
   return {
-    accountInfo, loading, error, loadingStage,
+    accountInfo, loading, error, loadingStage, savedKey,
+    bitNamesCache, resolveBitNames,
     enrichedAchievements, stats, categoryStats, almostDone, incomplete,
     loadData, reset,
   }

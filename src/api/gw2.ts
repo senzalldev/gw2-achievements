@@ -1,4 +1,4 @@
-import type { AccountInfo, AccountAchievement, AchievementCategory, AchievementDetail } from '../types/gw2'
+import type { AccountInfo, AccountAchievement, AchievementCategory, AchievementDetail, ItemDetail, SkinDetail, MiniDetail, DailyAchievements, Mastery, AccountMastery, MasteryPoints } from '../types/gw2'
 
 const BASE_URL = 'https://api.guildwars2.com/v2'
 
@@ -41,4 +41,44 @@ export async function getAchievementDetails(ids: number[]): Promise<AchievementD
   )
 
   return results.flat().filter(Boolean)
+}
+
+async function resolveByType<T extends { id: number; name: string }>(
+  endpoint: string, ids: number[]
+): Promise<Map<number, string>> {
+  if (ids.length === 0) return new Map()
+  const chunks: number[][] = []
+  for (let i = 0; i < ids.length; i += 200) chunks.push(ids.slice(i, i + 200))
+  const results = await Promise.all(chunks.map(chunk => apiFetch<T[]>(`${endpoint}?ids=${chunk.join(',')}`)))
+  const map = new Map<number, string>()
+  for (const item of results.flat().filter(Boolean)) map.set(item.id, item.name)
+  return map
+}
+
+export async function resolveItems(ids: number[]): Promise<Map<number, string>> {
+  return resolveByType<ItemDetail>('/items', ids)
+}
+
+export async function resolveSkins(ids: number[]): Promise<Map<number, string>> {
+  return resolveByType<SkinDetail>('/skins', ids)
+}
+
+export async function resolveMinis(ids: number[]): Promise<Map<number, string>> {
+  return resolveByType<MiniDetail>('/minis', ids)
+}
+
+export async function getDailyAchievements(): Promise<DailyAchievements> {
+  return apiFetch<DailyAchievements>('/achievements/daily')
+}
+
+export async function getMasteries(): Promise<Mastery[]> {
+  return apiFetch<Mastery[]>('/masteries?ids=all')
+}
+
+export async function getAccountMasteries(key: string): Promise<AccountMastery[]> {
+  return apiFetch<AccountMastery[]>('/account/masteries', key)
+}
+
+export async function getAccountMasteryPoints(key: string): Promise<MasteryPoints> {
+  return apiFetch<MasteryPoints>('/account/mastery/points', key)
 }

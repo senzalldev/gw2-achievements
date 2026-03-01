@@ -5,6 +5,7 @@
       :loading="loading"
       :loading-stage="loadingStage"
       :error="error"
+      :saved-key="savedKey"
       @submit="loadData"
     />
   </div>
@@ -112,7 +113,19 @@
           :achievements="enrichedAchievements"
           :categories="allCategories"
           :preset-category="presetCategory"
+          :bit-names-cache="bitNamesCache"
+          :resolve-bit-names="resolveBitNames"
         />
+      </template>
+
+      <!-- Daily tab -->
+      <template v-if="activeTab === 'daily'">
+        <DailyAchievements :account-done-ids="accountDoneIds" />
+      </template>
+
+      <!-- Masteries tab -->
+      <template v-if="activeTab === 'masteries'">
+        <MasteryProgress :api-key="savedKey" />
       </template>
 
     </main>
@@ -120,7 +133,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useAchievements } from './composables/useAchievements'
 import type { CategoryStats } from './composables/useAchievements'
 import ApiKeyInput from './components/ApiKeyInput.vue'
@@ -129,22 +142,31 @@ import StatusDonut from './components/StatusDonut.vue'
 import CategoryPointsChart from './components/CategoryPointsChart.vue'
 import AlmostDone from './components/AlmostDone.vue'
 import AchievementList from './components/AchievementList.vue'
+import DailyAchievements from './components/DailyAchievements.vue'
+import MasteryProgress from './components/MasteryProgress.vue'
 
 const {
-  accountInfo, loading, error, loadingStage,
+  accountInfo, loading, error, loadingStage, savedKey,
+  bitNamesCache, resolveBitNames,
   enrichedAchievements, stats, categoryStats, almostDone,
   loadData, reset,
 } = useAchievements()
 
 const allCategories = computed(() => categoryStats.value.map(cs => cs.category))
 
-const activeTab = ref<'overview' | 'categories' | 'browse'>('overview')
+const accountDoneIds = computed(() =>
+  new Set(enrichedAchievements.value.filter(a => a.account.done).map(a => a.account.id))
+)
+
+const activeTab = ref<'overview' | 'categories' | 'browse' | 'daily' | 'masteries'>('overview')
 const presetCategory = ref<number | ''>('')
 
 const tabs = [
   { id: 'overview' as const, label: 'Overview' },
   { id: 'categories' as const, label: 'Categories' },
   { id: 'browse' as const, label: 'Browse All' },
+  { id: 'daily' as const, label: 'Daily' },
+  { id: 'masteries' as const, label: 'Masteries' },
 ]
 
 function catCompletionPct(cat: CategoryStats): number {
@@ -155,4 +177,11 @@ function jumpToCategory(catId: number) {
   presetCategory.value = catId
   activeTab.value = 'browse'
 }
+
+// Auto-load if a key was remembered from last session
+onMounted(() => {
+  if (savedKey.value) {
+    loadData(savedKey.value)
+  }
+})
 </script>

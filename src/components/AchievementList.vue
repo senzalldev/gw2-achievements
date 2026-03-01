@@ -7,9 +7,9 @@
       <input
         v-model="search"
         type="text"
-        placeholder="Search by name..."
+        placeholder="Search for an achievement... (e.g. Conservation of Magic)"
         class="flex-1 bg-slate-900 border border-slate-600 text-white rounded-lg px-3 py-2 text-sm
-               placeholder-slate-600 focus:outline-none focus:border-amber-400 transition"
+               placeholder-slate-500 focus:outline-none focus:border-amber-400 transition"
       />
       <select
         v-model="selectedCategory"
@@ -48,7 +48,7 @@
         v-for="item in visible"
         :key="item.account.id"
         class="bg-slate-700/40 rounded-lg p-3 hover:bg-slate-700/70 transition-colors cursor-pointer"
-        @click="toggleExpand(item.account.id)"
+        @click="toggleExpand(item)"
       >
         <!-- Row summary -->
         <div class="flex items-center gap-3">
@@ -112,6 +112,80 @@
               </span>
             </div>
           </div>
+
+          <!-- "Still to do" — bit-based achievements -->
+          <div
+            v-if="!item.account.done && item.detail.bits?.length"
+            class="mt-3 pt-3 border-t border-slate-600/50"
+          >
+            <div class="flex items-center justify-between mb-2 gap-2 flex-wrap">
+              <h4 class="text-sm font-semibold text-amber-400">
+                Still to do
+                <span class="text-slate-500 font-normal text-xs ml-1">
+                  ({{ remainingBitsFor(item).length }} of {{ item.detail.bits.length }} tasks left)
+                </span>
+              </h4>
+              <button
+                v-if="remainingBitsFor(item).length > 0"
+                @click.stop="copyRemaining(item)"
+                class="text-xs px-3 py-1 rounded-lg border transition-colors shrink-0"
+                :class="copyFeedback === item.account.id
+                  ? 'border-emerald-500 text-emerald-400 bg-emerald-900/20'
+                  : 'border-amber-400/40 text-amber-400 hover:border-amber-400 hover:bg-amber-400/10'"
+              >
+                {{ copyFeedback === item.account.id ? '✓ Copied!' : '📋 Copy my to-do list' }}
+              </button>
+            </div>
+
+            <!-- Remaining tasks -->
+            <ul v-if="remainingBitsFor(item).length > 0" class="space-y-1 mb-2">
+              <li
+                v-for="(bit, idx) in remainingBitsFor(item)"
+                :key="idx"
+                class="flex items-start gap-2 text-xs text-amber-100"
+              >
+                <span class="text-amber-400 mt-0.5 shrink-0">○</span>
+                <span>{{ getBitName(bit) }}</span>
+              </li>
+            </ul>
+            <div v-else class="text-xs text-emerald-400 mb-2">All tasks complete — achievement should unlock soon!</div>
+
+            <!-- Completed tasks (collapsed) -->
+            <details v-if="doneBitsFor(item).length > 0" class="mt-1">
+              <summary class="text-xs text-slate-500 cursor-pointer hover:text-slate-400 transition-colors select-none">
+                Completed ({{ doneBitsFor(item).length }})
+              </summary>
+              <ul class="mt-1.5 space-y-1 pl-1">
+                <li
+                  v-for="(bit, idx) in doneBitsFor(item)"
+                  :key="idx"
+                  class="flex items-start gap-2 text-xs text-slate-600"
+                >
+                  <span class="shrink-0">✓</span>
+                  <span>{{ getBitName(bit) }}</span>
+                </li>
+              </ul>
+            </details>
+          </div>
+
+          <!-- "Still to do" — count-based (no bits) -->
+          <div
+            v-else-if="!item.account.done && item.account.current != null && item.account.max != null"
+            class="mt-3 pt-3 border-t border-slate-600/50 flex items-center justify-between gap-2"
+          >
+            <span class="text-xs text-slate-400">
+              {{ (item.account.max - item.account.current).toLocaleString() }} more to go
+            </span>
+            <button
+              @click.stop="copyRemaining(item)"
+              class="text-xs px-3 py-1 rounded-lg border transition-colors shrink-0"
+              :class="copyFeedback === item.account.id
+                ? 'border-emerald-500 text-emerald-400 bg-emerald-900/20'
+                : 'border-amber-400/40 text-amber-400 hover:border-amber-400 hover:bg-amber-400/10'"
+            >
+              {{ copyFeedback === item.account.id ? '✓ Copied!' : '📋 Copy progress' }}
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -132,12 +206,14 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
 import type { EnrichedAchievement } from '../composables/useAchievements'
-import type { AchievementCategory } from '../types/gw2'
+import type { AchievementCategory, AchievementBit } from '../types/gw2'
 
 const props = defineProps<{
   achievements: EnrichedAchievement[]
   categories: AchievementCategory[]
   presetCategory?: number | ''
+  bitNamesCache: Map<string, string>
+  resolveBitNames: (bits: AchievementBit[]) => Promise<void>
 }>()
 
 const search = ref('')
@@ -149,6 +225,7 @@ watch(() => props.presetCategory, (val) => {
 const statusFilter = ref<'all' | 'incomplete' | 'done' | 'inprogress'>('incomplete')
 const visibleCount = ref(50)
 const expanded = ref(new Set<number>())
+const copyFeedback = ref<number | null>(null)
 
 const sortedCategories = computed(() =>
   [...props.categories].sort((a, b) => a.name.localeCompare(b.name))
@@ -168,10 +245,60 @@ const filtered = computed(() => {
 
 const visible = computed(() => filtered.value.slice(0, visibleCount.value))
 
-function toggleExpand(id: number) {
-  if (expanded.value.has(id)) expanded.value.delete(id)
-  else expanded.value.add(id)
+function remainingBitsFor(item: EnrichedAchievement): AchievementBit[] {
+  if (!item.detail.bits) return []
+  const doneBitIndices = new Set(item.account.bits ?? [])
+  return item.detail.bits.filter((_, idx) => !doneBitIndices.has(idx))
+}
+
+function doneBitsFor(item: EnrichedAchievement): AchievementBit[] {
+  if (!item.detail.bits) return []
+  const doneBitIndices = new Set(item.account.bits ?? [])
+  return item.detail.bits.filter((_, idx) => doneBitIndices.has(idx))
+}
+
+function getBitName(bit: AchievementBit): string {
+  if (bit.type === 'Text') return bit.text ?? 'Unknown task'
+  if (bit.id != null) {
+    const cacheKey = `${bit.type.toLowerCase()}:${bit.id}`
+    return props.bitNamesCache.get(cacheKey) ?? `${bit.type} #${bit.id}`
+  }
+  return 'Unknown task'
+}
+
+async function toggleExpand(item: EnrichedAchievement) {
+  const id = item.account.id
+  if (expanded.value.has(id)) {
+    expanded.value.delete(id)
+  } else {
+    expanded.value.add(id)
+    // Kick off background resolution of bit names (non-blocking)
+    if (item.detail.bits?.some(b => b.type !== 'Text' && b.id != null)) {
+      props.resolveBitNames(item.detail.bits!)
+    }
+  }
   // Trigger reactivity
   expanded.value = new Set(expanded.value)
+}
+
+async function copyRemaining(item: EnrichedAchievement) {
+  let text = ''
+  if (item.detail.bits?.length && !item.account.done) {
+    const remaining = remainingBitsFor(item)
+    if (remaining.length === 0) return
+    text = `${item.detail.name} — ${remaining.length} remaining:\n`
+    text += remaining.map(b => `- ${getBitName(b)}`).join('\n')
+  } else if (item.account.current != null && item.account.max != null) {
+    const left = item.account.max - item.account.current
+    text = `${item.detail.name} — ${item.account.current.toLocaleString()}/${item.account.max.toLocaleString()} (${item.progressPercent}% done), ${left.toLocaleString()} remaining`
+  }
+  if (!text) return
+  try {
+    await navigator.clipboard.writeText(text)
+    copyFeedback.value = item.account.id
+    setTimeout(() => { copyFeedback.value = null }, 2000)
+  } catch {
+    // Clipboard not available — silently ignore
+  }
 }
 </script>

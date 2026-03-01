@@ -55,3 +55,24 @@ export interface AchievementCategory {
   icon?: string
   achievements: number[]
 }
+
+export interface ItemDetail { id: number; name: string }
+export interface SkinDetail { id: number; name: string }
+export interface MiniDetail { id: number; name: string }
+
+export interface DailyEntry { id: number; level: { min: number; max: number } }
+export interface DailyAchievements {
+  pve: DailyEntry[]
+  pvp: DailyEntry[]
+  wvw: DailyEntry[]
+  fractals: DailyEntry[]
+  special: DailyEntry[]
+}
+
+export interface MasteryLevel { name: string; description: string; point_cost: number; exp_cost: number }
+export interface Mastery { id: number; name: string; region: string; levels: MasteryLevel[] }
+export interface AccountMastery { id: number; level: number }
+export interface MasteryPoints {
+  totals: { region: string; spent: number; earned: number }[]
+  unlocked: number
+}

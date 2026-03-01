@@ -10,13 +10,25 @@
 
       <!-- Card -->
       <div class="bg-slate-800 rounded-2xl p-8 shadow-2xl border border-slate-700">
-        <h2 class="text-lg font-semibold text-white mb-1">Enter your API Key</h2>
+        <h2 class="text-lg font-semibold text-white mb-1">Enter your tracker key</h2>
         <p class="text-sm text-slate-400 mb-5">
-          Generate a key at
+          Generate a personal tracker key at
           <a href="https://account.arena.net/applications" target="_blank" rel="noopener"
              class="text-amber-400 hover:text-amber-300 underline">account.arena.net</a>.
-          Enable the <strong class="text-white">Progression</strong> permission.
+          Name it anything and enable the <strong class="text-white">Progression</strong> permission.
         </p>
+
+        <!-- Remembered key notice -->
+        <div v-if="savedKey && !clearedKey" class="mb-4 flex items-center justify-between bg-slate-700/50 border border-slate-600 rounded-lg px-3 py-2">
+          <span class="text-xs text-slate-400">Key remembered from your last visit</span>
+          <button
+            type="button"
+            @click="clearKey"
+            class="text-xs text-slate-500 hover:text-slate-300 transition-colors"
+          >
+            Use a different key
+          </button>
+        </div>
 
         <form @submit.prevent="submit">
           <input
@@ -47,8 +59,8 @@
 
         <!-- Privacy note -->
         <p class="mt-5 text-xs text-slate-500 text-center">
-          Your API key is only used to call the official GW2 API directly from your browser.
-          It is never stored or sent to any other server.
+          Your tracker key is saved locally in your browser for convenience and only used to call the official GW2 API directly.
+          It is never sent to any other server.
         </p>
       </div>
     </div>
@@ -62,13 +74,20 @@ const props = defineProps<{
   loading: boolean
   loadingStage: string
   error: string
+  savedKey?: string
 }>()
 
 const emit = defineEmits<{
   submit: [key: string]
 }>()
 
-const key = ref('')
+const key = ref(props.savedKey ?? '')
+const clearedKey = ref(false)
+
+function clearKey() {
+  key.value = ''
+  clearedKey.value = true
+}
 
 function submit() {
   if (key.value.trim()) emit('submit', key.value.trim())
