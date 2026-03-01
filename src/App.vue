@@ -274,12 +274,23 @@
         <AboutTab />
       </template>
 
+      <!-- Footer -->
+      <footer class="border-t border-slate-800 mt-4 py-4 flex items-center justify-center gap-2 text-xs text-slate-600">
+        <span>⚔️ GW2 Achievement Tracker</span>
+        <span>·</span>
+        <span>v{{ APP_VERSION }}</span>
+        <span>·</span>
+        <a href="https://senzall.com" target="_blank" rel="noopener"
+           class="text-amber-900 hover:text-amber-600 transition-colors">senzall.com</a>
+      </footer>
+
     </main>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
+import { APP_VERSION } from './version'
 import { useAchievements } from './composables/useAchievements'
 import type { CategoryStats, EnrichedAchievement } from './composables/useAchievements'
 import type { SavedAccount } from './types/gw2'
