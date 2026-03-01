@@ -37,21 +37,8 @@
           </p>
         </div>
 
-        <!-- Header links -->
-        <div class="flex items-center gap-2">
-          <a href="https://senzall.com/ltmessages" target="_blank" rel="noopener"
-             class="text-sm text-slate-400 hover:text-white border border-slate-600 hover:border-slate-400
-                    px-3 py-1.5 rounded-lg transition-colors hidden sm:flex items-center gap-1.5">
-            💬 LT Messages
-          </a>
-          <a href="https://senzall.com" target="_blank" rel="noopener"
-             class="text-sm text-amber-500 hover:text-amber-400 border border-amber-800 hover:border-amber-600
-                    px-3 py-1.5 rounded-lg transition-colors hidden sm:flex items-center gap-1.5">
-            senzall.com ↗
-          </a>
-        </div>
-
         <!-- Accounts dropdown -->
+        <div class="flex items-center gap-2">
         <div class="relative">
           <button
             @click="accountsOpen = !accountsOpen"
@@ -98,6 +85,13 @@
 
           <!-- Click-outside overlay -->
           <div v-if="accountsOpen" @click="accountsOpen = false" class="fixed inset-0 z-40" />
+        </div>
+
+        <a href="https://senzall.com" target="_blank" rel="noopener"
+           class="text-sm text-amber-500 hover:text-amber-400 border border-amber-800 hover:border-amber-600
+                  px-3 py-1.5 rounded-lg transition-colors hidden sm:flex items-center gap-1.5">
+          senzall.com ↗
+        </a>
         </div>
       </div>
     </header>
