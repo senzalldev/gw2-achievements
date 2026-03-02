@@ -165,6 +165,16 @@
         </button>
       </template>
 
+      <!-- My Stats tab -->
+      <template v-if="activeTab === 'stats'">
+        <MyStatsTab
+          :achievements="enrichedAchievements"
+          :category-stats="categoryStats"
+          :account-info="accountInfo"
+          :stats="stats"
+        />
+      </template>
+
       <!-- Almost Done tab -->
       <template v-if="activeTab === 'almostdone'">
         <AlmostDone
@@ -309,6 +319,7 @@ import AchievementList from './components/AchievementList.vue'
 import DailyAchievements from './components/DailyAchievements.vue'
 import MasteryProgress from './components/MasteryProgress.vue'
 import AboutTab from './components/AboutTab.vue'
+import MyStatsTab from './components/MyStatsTab.vue'
 
 const {
   accountInfo, loading, error, loadingStage, savedKey,
@@ -321,7 +332,7 @@ const {
 
 const allCategories = computed(() => categoryStats.value.map(cs => cs.category))
 
-const activeTab = ref<'overview' | 'almostdone' | 'mostvaluable' | 'goals' | 'categories' | 'browse' | 'daily' | 'masteries' | 'about'>('overview')
+const activeTab = ref<'overview' | 'stats' | 'almostdone' | 'mostvaluable' | 'goals' | 'categories' | 'browse' | 'daily' | 'masteries' | 'about'>('overview')
 const presetCategory = ref<number | ''>('')
 const presetSearch = ref('')
 const presetStatus = ref<'all' | 'incomplete' | 'done' | 'inprogress' | 'notstarted' | undefined>(undefined)
@@ -337,6 +348,7 @@ const filteredCategoryStats = computed(() => {
 
 const tabs = [
   { id: 'overview' as const, label: 'Overview' },
+  { id: 'stats' as const, label: 'My Stats' },
   { id: 'daily' as const, label: 'Daily' },
   { id: 'almostdone' as const, label: 'Almost Done' },
   { id: 'mostvaluable' as const, label: 'Most Valuable' },
