@@ -159,7 +159,8 @@ export function useAchievements() {
     const done = enrichedAchievements.value.filter(a => a.account.done).length
     const inProgress = enrichedAchievements.value.filter(a => !a.account.done && (a.account.current ?? 0) > 0).length
     const notStarted = enrichedAchievements.value.filter(a => !a.account.done && (a.account.current ?? 0) === 0).length
-    const totalPoints = enrichedAchievements.value.reduce((s, a) => s + a.earnedPoints, 0)
+    const achievementPoints = enrichedAchievements.value.reduce((s, a) => s + a.earnedPoints, 0)
+    const totalPoints = achievementPoints + (accountInfo.value?.daily_ap ?? 0) + (accountInfo.value?.monthly_ap ?? 0)
     const maxPoints = enrichedAchievements.value.reduce((s, a) => s + a.totalPoints, 0)
     return { done, inProgress, notStarted, total: enrichedAchievements.value.length, totalPoints, maxPoints }
   })
