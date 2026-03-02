@@ -12,18 +12,20 @@ ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip)
 
 const props = defineProps<{
   achievements: EnrichedAchievement[]
+  totalInGame: number
 }>()
 
 const counts = computed(() => {
-  let notStarted = 0, earlyDays = 0, halfway = 0, almostDone = 0, complete = 0
+  let earlyDays = 0, halfway = 0, almostDone = 0, complete = 0
   for (const a of props.achievements) {
     const pct = a.progressPercent
     if (a.account.done || pct >= 100) complete++
     else if (pct >= 75) almostDone++
     else if (pct >= 25) halfway++
     else if (pct > 0) earlyDays++
-    else notStarted++
   }
+  // notStarted = every game achievement the user hasn't touched at all
+  const notStarted = Math.max(0, props.totalInGame - complete - almostDone - halfway - earlyDays)
   return { notStarted, earlyDays, halfway, almostDone, complete }
 })
 

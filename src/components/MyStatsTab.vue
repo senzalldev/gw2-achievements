@@ -56,11 +56,14 @@
         <div class="bg-slate-800 rounded-xl p-4 border border-slate-700/80">
           <div class="text-xs text-slate-500 mb-1">Completed</div>
           <div class="text-xl font-bold text-emerald-400">{{ completionPct }}%</div>
-          <div class="text-xs text-slate-500 mt-0.5">{{ stats.done.toLocaleString() }} / {{ stats.total.toLocaleString() }}</div>
+          <div class="text-xs text-slate-500 mt-0.5">{{ stats.done.toLocaleString() }} / {{ stats.totalInGame.toLocaleString() }}</div>
         </div>
         <div class="bg-slate-800 rounded-xl p-4 border border-slate-700/80">
           <div class="text-xs text-slate-500 mb-1">AP Efficiency</div>
-          <div class="text-xl font-bold text-purple-400">{{ apEfficiency }}%</div>
+          <div class="text-xl font-bold text-purple-400">
+            <span v-if="gameStatsReady === false" class="text-slate-500 text-base">Loading…</span>
+            <span v-else>{{ apEfficiency }}%</span>
+          </div>
           <div class="text-xs text-slate-500 mt-0.5">{{ stats.totalPoints.toLocaleString() }} / {{ stats.maxPoints.toLocaleString() }}</div>
         </div>
         <div class="bg-slate-800 rounded-xl p-4 border border-slate-700/80">
@@ -87,6 +90,7 @@
             :achievements="achievements"
             :account-info="accountInfo"
             :mode="mode"
+            :total-available-ap="stats.maxPoints"
           />
         </div>
 
@@ -108,7 +112,7 @@
           <h3 class="font-semibold text-white mb-3 text-sm">Progress Distribution</h3>
           <p class="text-xs text-slate-500 mb-3">How far along are your achievements?</p>
           <div style="position: relative; height: 200px">
-            <ProgressBucketChart :achievements="achievements" />
+            <ProgressBucketChart :achievements="achievements" :total-in-game="stats.totalInGame" />
           </div>
         </div>
 
@@ -145,11 +149,13 @@ const props = defineProps<{
   achievements: EnrichedAchievement[]
   categoryStats: CategoryStats[]
   accountInfo: AccountInfo | null
+  gameStatsReady?: boolean
   stats: {
     done: number
     inProgress: number
     notStarted: number
     total: number
+    totalInGame: number
     totalPoints: number
     maxPoints: number
   }
@@ -160,7 +166,7 @@ const exporting = ref(false)
 const exportRef = ref<HTMLElement | null>(null)
 
 const completionPct = computed(() =>
-  props.stats.total > 0 ? Math.round((props.stats.done / props.stats.total) * 100) : 0
+  props.stats.totalInGame > 0 ? Math.round((props.stats.done / props.stats.totalInGame) * 100) : 0
 )
 
 const apEfficiency = computed(() =>

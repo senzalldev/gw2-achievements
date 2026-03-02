@@ -172,6 +172,7 @@
           :category-stats="categoryStats"
           :account-info="accountInfo"
           :stats="stats"
+          :game-stats-ready="gameStatsReady"
         />
       </template>
 
@@ -327,6 +328,7 @@ const {
   bitNamesCache, resolveBitNames,
   enrichedAchievements, stats, categoryStats, almostDone, mostValuable,
   categoryToGroup, sortedGroups,
+  gameStatsReady,
   loadData, reset,
 } = useAchievements()
 

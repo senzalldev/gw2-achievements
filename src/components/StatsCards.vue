@@ -25,7 +25,7 @@
         </div>
       </template>
       <template v-else>
-        <div class="text-3xl font-bold text-emerald-400">100</div>
+        <div class="text-3xl font-bold text-emerald-400">121</div>
         <div class="text-sm text-slate-400 mt-1">AP chests claimed 🎉</div>
       </template>
     </div>
@@ -35,7 +35,7 @@
   <div class="bg-slate-800 rounded-xl p-5 border border-slate-700">
     <div class="flex justify-between text-sm mb-2">
       <span class="text-slate-300 font-medium">Overall Completion</span>
-      <span class="text-slate-400">{{ stats.done.toLocaleString() }} / {{ stats.total.toLocaleString() }} achievements</span>
+      <span class="text-slate-400">{{ stats.done.toLocaleString() }} / {{ stats.totalInGame.toLocaleString() }} achievements</span>
     </div>
     <div class="w-full bg-slate-700 rounded-full h-3">
       <div
@@ -51,7 +51,7 @@
     <div class="flex justify-between text-sm mb-3">
       <span class="text-slate-300 font-medium">AP Chest Progress</span>
       <span class="text-slate-400">
-        Chest {{ chestsClaimed }} / 100
+        Chest {{ chestsClaimed }} / 121
         <span v-if="nextChest" class="text-slate-600 ml-1">({{ nextChest.remaining }} AP to next)</span>
       </span>
     </div>
@@ -64,20 +64,20 @@
       ></div>
       <!-- Next chest marker -->
       <div
-        v-if="nextChest && nextChest.target <= 50000"
+        v-if="nextChest && nextChest.target <= 60000"
         class="absolute top-0 h-3 w-0.5 bg-sky-400 rounded"
-        :style="{ left: (nextChest.target / 50000 * 100) + '%' }"
+        :style="{ left: (nextChest.target / 60000 * 100) + '%' }"
       ></div>
     </div>
 
     <!-- Milestone labels -->
     <div class="flex justify-between text-xs text-slate-600">
       <span>0</span>
-      <span>10k</span>
-      <span>20k</span>
-      <span>30k</span>
-      <span>40k</span>
-      <span>50k AP</span>
+      <span>12k</span>
+      <span>24k</span>
+      <span>36k</span>
+      <span>48k</span>
+      <span>60k AP</span>
     </div>
 
     <!-- Current segment: progress within this 500-AP window -->
@@ -105,25 +105,30 @@ const props = defineProps<{
     inProgress: number
     notStarted: number
     total: number
+    totalInGame: number
     totalPoints: number
     maxPoints: number
   }
 }>()
 
 const completionPct = computed(() =>
-  props.stats.total > 0 ? Math.round((props.stats.done / props.stats.total) * 100) : 0
+  props.stats.totalInGame > 0 ? Math.round((props.stats.done / props.stats.totalInGame) * 100) : 0
 )
 
-const chestsClaimed = computed(() => Math.min(100, Math.floor(props.stats.totalPoints / 500)))
+// First chest at 100 AP, then every 500 AP up to 60,000 = 121 total chests
+const chestsClaimed = computed(() => {
+  const earned = props.stats.totalPoints
+  return earned >= 100 ? 1 + Math.min(120, Math.floor(earned / 500)) : 0
+})
 
 const nextChest = computed(() => {
   const earned = props.stats.totalPoints
-  if (earned >= 50000) return null
-  const target = (Math.floor(earned / 500) + 1) * 500
+  if (earned >= 60000) return null
+  const target = earned < 100 ? 100 : (Math.floor(earned / 500) + 1) * 500
   return { target, remaining: target - earned }
 })
 
 const segmentProgress = computed(() => props.stats.totalPoints % 500)
 
-const lifetimePct = computed(() => Math.min(100, (props.stats.totalPoints / 50000) * 100))
+const lifetimePct = computed(() => Math.min(100, (props.stats.totalPoints / 60000) * 100))
 </script>

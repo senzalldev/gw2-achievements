@@ -90,6 +90,10 @@ export function useAchievements() {
 
   const savedAccounts = ref<SavedAccount[]>(loadSavedAccounts())
 
+  // True once the background fetch of all game achievement details has settled.
+  // Until then, maxPoints is computed only from the user's tracked achievements.
+  const gameStatsReady = ref(false)
+
   function persistAccounts() {
     localStorage.setItem('gw2_accounts', JSON.stringify(savedAccounts.value))
   }
@@ -110,6 +114,23 @@ export function useAchievements() {
   const categories = ref<AchievementCategory[]>([])
   const groups = ref<AchievementGroup[]>([])
   const detailsMap = ref(new Map<number, AchievementDetail>())
+
+  // Total unique achievement IDs across all categories — the true game total.
+  // Available immediately after the categories fetch (main load), before background fetch.
+  const totalAchievementsInGame = computed(() =>
+    new Set(categories.value.flatMap(c => c.achievements)).size
+  )
+
+  // Sum of totalPoints across every detail in detailsMap.
+  // Initially covers only the user's tracked achievements; grows to full game total
+  // once the background fetch completes.
+  const gameMaxAchievementPoints = computed(() => {
+    let total = 0
+    for (const detail of detailsMap.value.values()) {
+      total += calculateTotalPoints(detail)
+    }
+    return total
+  })
 
   // Map achievement ID -> category
   const achievementToCategory = computed(() => {
@@ -158,11 +179,25 @@ export function useAchievements() {
   const stats = computed(() => {
     const done = enrichedAchievements.value.filter(a => a.account.done).length
     const inProgress = enrichedAchievements.value.filter(a => !a.account.done && (a.account.current ?? 0) > 0).length
-    const notStarted = enrichedAchievements.value.filter(a => !a.account.done && (a.account.current ?? 0) === 0).length
+    const totalInGame = totalAchievementsInGame.value
+    // notStarted = every achievement in the game the user has not completed or started.
+    // This includes achievements the API never returned (truly never touched).
+    const notStarted = Math.max(0, totalInGame - done - inProgress)
     const achievementPoints = enrichedAchievements.value.reduce((s, a) => s + a.earnedPoints, 0)
     const totalPoints = achievementPoints + (accountInfo.value?.daily_ap ?? 0) + (accountInfo.value?.monthly_ap ?? 0)
-    const maxPoints = enrichedAchievements.value.reduce((s, a) => s + a.totalPoints, 0)
-    return { done, inProgress, notStarted, total: enrichedAchievements.value.length, totalPoints, maxPoints }
+    // GW2 wiki: daily/monthly AP hard-capped at 15,000 total.
+    // gameMaxAchievementPoints starts as user's tracked AP and grows to the full game max
+    // once the background fetch settles.
+    const maxPoints = gameMaxAchievementPoints.value + 15000
+    return {
+      done,
+      inProgress,
+      notStarted,
+      total: enrichedAchievements.value.length, // tracked count — used by Browse/tabs
+      totalInGame,                               // true game total — used for completion %
+      totalPoints,
+      maxPoints,
+    }
   })
 
   const categoryStats = computed<CategoryStats[]>(() => {
@@ -204,6 +239,7 @@ export function useAchievements() {
   async function loadData(key: string) {
     loading.value = true
     error.value = ''
+    gameStatsReady.value = false
 
     try {
       loadingStage.value = "Checking your tracker key..."
@@ -231,6 +267,25 @@ export function useAchievements() {
       for (const d of details) map.set(d.id, d)
       detailsMap.value = map
 
+      // Background fetch: load details for ALL game achievement IDs so we can compute
+      // the true game max AP. Non-blocking — UI is already usable at this point.
+      const allCategoryIds = [...new Set(cats.flatMap(c => c.achievements))]
+      const missingIds = allCategoryIds.filter(id => !map.has(id))
+      if (missingIds.length > 0) {
+        getAchievementDetails(missingIds)
+          .then(extraDetails => {
+            const extended = new Map(detailsMap.value)
+            for (const d of extraDetails) extended.set(d.id, d)
+            detailsMap.value = extended
+            gameStatsReady.value = true
+          })
+          .catch(() => {
+            gameStatsReady.value = true // use best estimate on failure
+          })
+      } else {
+        gameStatsReady.value = true
+      }
+
     } catch (e) {
       error.value = e instanceof Error ? e.message : 'An unknown error occurred.'
     } finally {
@@ -245,6 +300,7 @@ export function useAchievements() {
     categories.value = []
     detailsMap.value = new Map()
     error.value = ''
+    gameStatsReady.value = false
     localStorage.removeItem('gw2_last_key')
     savedKey.value = ''
   }
@@ -261,6 +317,7 @@ export function useAchievements() {
     bitNamesCache, resolveBitNames,
     enrichedAchievements, stats, categoryStats, almostDone, incomplete, mostValuable,
     categoryToGroup, sortedGroups,
+    gameStatsReady,
     loadData, reset,
   }
 }

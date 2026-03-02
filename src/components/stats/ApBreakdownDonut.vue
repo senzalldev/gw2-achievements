@@ -26,12 +26,18 @@ const props = defineProps<{
   achievements: EnrichedAchievement[]
   accountInfo: AccountInfo | null
   mode: 'percent' | 'count'
+  totalAvailableAp?: number
 }>()
 
 const earned = computed(() => props.achievements.reduce((s, a) => s + a.earnedPoints, 0))
 const dailyMonthly = computed(() => (props.accountInfo?.daily_ap ?? 0) + (props.accountInfo?.monthly_ap ?? 0))
-const maxFromAchievements = computed(() => props.achievements.reduce((s, a) => s + a.totalPoints, 0))
-const remaining = computed(() => Math.max(0, maxFromAchievements.value - earned.value))
+const remaining = computed(() => {
+  if (props.totalAvailableAp != null) {
+    return Math.max(0, props.totalAvailableAp - earned.value - dailyMonthly.value)
+  }
+  const maxFromAchievements = props.achievements.reduce((s, a) => s + a.totalPoints, 0)
+  return Math.max(0, maxFromAchievements - earned.value)
+})
 const grandTotal = computed(() => earned.value + dailyMonthly.value + remaining.value)
 
 function fmt(n: number): string {
