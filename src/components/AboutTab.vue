@@ -29,19 +29,22 @@
       </p>
       <ul class="space-y-2 text-sm text-slate-400">
         <li class="flex items-start gap-2"><span class="text-amber-400 shrink-0 mt-0.5">•</span>
+          <span><strong class="text-slate-300">My Stats</strong> — charts, AP breakdown, category radar, progress distribution, and an AP opportunity finder. We're always experimenting with smarter ways to read your numbers here.</span>
+        </li>
+        <li class="flex items-start gap-2"><span class="text-amber-400 shrink-0 mt-0.5">•</span>
           <span><strong class="text-slate-300">Almost Done</strong> — achievements you're closest to completing, sorted by progress</span>
         </li>
         <li class="flex items-start gap-2"><span class="text-amber-400 shrink-0 mt-0.5">•</span>
           <span><strong class="text-slate-300">Most Valuable</strong> — incomplete achievements with the most AP still on the table</span>
         </li>
         <li class="flex items-start gap-2"><span class="text-amber-400 shrink-0 mt-0.5">•</span>
-          <span><strong class="text-slate-300">Goals</strong> — smart filters for mastery points, titles, skins, and repeatables</span>
+          <span><strong class="text-slate-300">Goals</strong> — smart filters for mastery points, titles, skins, repeatables, and raids</span>
         </li>
         <li class="flex items-start gap-2"><span class="text-amber-400 shrink-0 mt-0.5">•</span>
           <span><strong class="text-slate-300">Browse All</strong> — full searchable achievement list with content group, status, and type filters (including Raids, Fractals, PvP)</span>
         </li>
         <li class="flex items-start gap-2"><span class="text-amber-400 shrink-0 mt-0.5">•</span>
-          <span><strong class="text-slate-300">Daily & Masteries</strong> — today's Wizard's Vault objectives and your mastery track progress</span>
+          <span><strong class="text-slate-300">Daily</strong> — Wizard's Vault objectives, world bosses, dungeon paths, map chests, and weekly raid clears</span>
         </li>
       </ul>
     </div>
@@ -108,6 +111,107 @@
       </ul>
     </div>
 
+    <!-- Understanding your numbers -->
+    <div class="bg-slate-800 rounded-xl border border-slate-700 p-5">
+      <h3 class="font-semibold text-white mb-3 flex items-center gap-2">
+        <span>📊</span> Understanding Your Numbers
+      </h3>
+      <p class="text-sm text-slate-400 mb-4 leading-relaxed">
+        GW2's achievement system has some delightful quirks. Here's what's actually going on behind the numbers.
+      </p>
+
+      <div class="space-y-4">
+
+        <div class="bg-slate-700/30 rounded-lg p-4 border border-slate-600/40">
+          <div class="text-sm font-semibold text-white mb-1">Why your completion % might look low</div>
+          <p class="text-sm text-slate-400 leading-relaxed">
+            The GW2 API only returns achievements you've <em>touched</em> — started or completed.
+            Thousands of achievements you've never attempted are simply absent from the response.
+            The tracker looks up the full game list from category data and measures you against
+            <strong class="text-slate-300">all of them</strong>, not just the ones you tried.
+            It's more honest, even if the number stings a little.
+          </p>
+        </div>
+
+        <div class="bg-slate-700/30 rounded-lg p-4 border border-slate-600/40">
+          <div class="text-sm font-semibold text-white mb-1">Why AP Efficiency briefly shows "Loading…"</div>
+          <p class="text-sm text-slate-400 leading-relaxed">
+            Your personal achievement details load fast. But computing your true AP potential requires
+            fetching details for <strong class="text-slate-300">every achievement in the game</strong> — thousands of IDs.
+            The tracker does this in the background so you can browse immediately, and AP Efficiency
+            updates quietly once the full picture arrives. No refresh needed.
+          </p>
+        </div>
+
+        <div class="bg-slate-700/30 rounded-lg p-4 border border-slate-600/40">
+          <div class="text-sm font-semibold text-white mb-1">The 121 chests (yes, 121)</div>
+          <p class="text-sm text-slate-400 leading-relaxed">
+            AP milestone chests are awarded at <strong class="text-slate-300">100 AP</strong>, then every
+            <strong class="text-slate-300">500 AP up to 60,000</strong> — that's 121 chests total.
+            The final one unlocks the title <em class="text-amber-400">Uncontrollable Achiever</em>.
+            The Overview tab's milestone bar now reflects the full 60k range.
+            (We previously had it capped at 50k. We found out. We fixed it. Moving on.)
+          </p>
+        </div>
+
+        <div class="bg-slate-700/30 rounded-lg p-4 border border-slate-600/40">
+          <div class="text-sm font-semibold text-white mb-1">Daily & Monthly AP cap</div>
+          <p class="text-sm text-slate-400 leading-relaxed">
+            You can earn up to <strong class="text-slate-300">15,000 AP from dailies and monthlies combined</strong>.
+            Once you hit that cap the AP stops but the gold, laurels, and other rewards keep coming —
+            ArenaNet's way of saying "we see you, veteran". The tracker adds your earned daily/monthly AP
+            on top of your achievement AP for the real total.
+          </p>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Resources -->
+    <div class="bg-slate-800 rounded-xl border border-slate-700 p-5">
+      <h3 class="font-semibold text-white mb-3 flex items-center gap-2">
+        <span>🔗</span> Useful Resources
+      </h3>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <a href="https://wiki.guildwars2.com/wiki/Achievement_point_rewards" target="_blank" rel="noopener"
+           class="flex items-start gap-3 bg-slate-700/40 rounded-lg p-3 border border-slate-600/50
+                  hover:border-amber-500/40 transition-colors group">
+          <span class="text-xl shrink-0 mt-0.5">🏆</span>
+          <div>
+            <div class="text-sm font-medium text-white group-hover:text-amber-300 transition-colors">AP Milestone Rewards</div>
+            <div class="text-xs text-slate-500">All 121 chest thresholds, titles, and bonuses</div>
+          </div>
+        </a>
+        <a href="https://wiki.guildwars2.com/wiki/Achievement" target="_blank" rel="noopener"
+           class="flex items-start gap-3 bg-slate-700/40 rounded-lg p-3 border border-slate-600/50
+                  hover:border-amber-500/40 transition-colors group">
+          <span class="text-xl shrink-0 mt-0.5">📖</span>
+          <div>
+            <div class="text-sm font-medium text-white group-hover:text-amber-300 transition-colors">Achievement Wiki</div>
+            <div class="text-xs text-slate-500">Categories, AP totals, and mastery points by group</div>
+          </div>
+        </a>
+        <a href="https://wiki.guildwars2.com/wiki/API:2/account/achievements" target="_blank" rel="noopener"
+           class="flex items-start gap-3 bg-slate-700/40 rounded-lg p-3 border border-slate-600/50
+                  hover:border-amber-500/40 transition-colors group">
+          <span class="text-xl shrink-0 mt-0.5">⚙️</span>
+          <div>
+            <div class="text-sm font-medium text-white group-hover:text-amber-300 transition-colors">GW2 API Docs</div>
+            <div class="text-xs text-slate-500">What the achievement endpoint actually returns</div>
+          </div>
+        </a>
+        <a href="https://account.arena.net/applications" target="_blank" rel="noopener"
+           class="flex items-start gap-3 bg-slate-700/40 rounded-lg p-3 border border-slate-600/50
+                  hover:border-amber-500/40 transition-colors group">
+          <span class="text-xl shrink-0 mt-0.5">🔑</span>
+          <div>
+            <div class="text-sm font-medium text-white group-hover:text-amber-300 transition-colors">Create an API Key</div>
+            <div class="text-xs text-slate-500">Only "Progression" permission needed for this tracker</div>
+          </div>
+        </a>
+      </div>
+    </div>
+
     <!-- Tech stack -->
     <div class="bg-slate-800 rounded-xl border border-slate-700 p-5">
       <h3 class="font-semibold text-white mb-3 flex items-center gap-2">
@@ -147,6 +251,9 @@
         </li>
         <li class="flex items-start gap-2"><span class="text-purple-400 shrink-0 mt-0.5">★</span>
           <span>The entire app is <strong class="text-slate-300">zero-backend</strong> — there's no login, no account, and no way for anyone to see your data. It's just you and ArenaNet's API.</span>
+        </li>
+        <li class="flex items-start gap-2"><span class="text-purple-400 shrink-0 mt-0.5">★</span>
+          <span>After your data loads, the tracker quietly fetches details for <strong class="text-slate-300">every achievement in the game</strong> in the background — not just yours — so AP totals and the "Not Started" bucket reflect the real game-wide picture rather than only what you've touched.</span>
         </li>
       </ul>
     </div>

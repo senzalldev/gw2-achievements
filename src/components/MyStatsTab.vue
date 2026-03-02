@@ -5,7 +5,7 @@
     <div class="flex items-center justify-between flex-wrap gap-3">
       <div>
         <h2 class="text-lg font-bold text-white">My Stats</h2>
-        <p class="text-xs text-slate-500 mt-0.5">Charts and highlights for your GW2 account</p>
+        <p class="text-xs text-slate-500 mt-0.5">Charts and highlights for your GW2 account · <span class="text-slate-600">always experimenting</span></p>
       </div>
       <div class="flex items-center gap-2">
         <!-- % / # toggle -->
