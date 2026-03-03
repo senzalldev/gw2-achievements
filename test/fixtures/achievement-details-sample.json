@@ -1,0 +1,1724 @@
+[
+  {
+    "id": 1,
+    "name": "Centaur Slayer",
+    "description": "A few more centaur herds are thinned out.",
+    "requirement": "Kill  centaurs.",
+    "locked_text": "",
+    "type": "Default",
+    "flags": [
+      "Permanent"
+    ],
+    "tiers": [
+      {
+        "count": 10,
+        "points": 1
+      },
+      {
+        "count": 100,
+        "points": 5
+      },
+      {
+        "count": 500,
+        "points": 5
+      },
+      {
+        "count": 1000,
+        "points": 5
+      }
+    ]
+  },
+  {
+    "id": 860,
+    "name": "Woodpecker",
+    "description": "Take down the kingpin.",
+    "requirement": "Destroy all tree stumps in World 2 Tribulation Mode.",
+    "locked_text": "",
+    "type": "Default",
+    "flags": [
+      "Permanent"
+    ],
+    "bits": [
+      {
+        "type": "Text",
+        "text": "Zone 01"
+      },
+      {
+        "type": "Text",
+        "text": "Zone 02"
+      },
+      {
+        "type": "Text",
+        "text": "Zone 03"
+      }
+    ],
+    "tiers": [
+      {
+        "count": 1,
+        "points": 10
+      },
+      {
+        "count": 2,
+        "points": 10
+      },
+      {
+        "count": 3,
+        "points": 10
+      }
+    ]
+  },
+  {
+    "id": 1242,
+    "name": "Regifter",
+    "description": "One for me...",
+    "requirement": "Return gifts in Snowball Mayhem.",
+    "locked_text": "",
+    "type": "Default",
+    "flags": [
+      "Pvp",
+      "Hidden",
+      "Permanent"
+    ],
+    "tiers": [
+      {
+        "count": 1,
+        "points": 1
+      }
+    ]
+  },
+  {
+    "id": 4,
+    "name": "Harpy Slayer",
+    "description": "Clip the wings of these she-beasts.",
+    "requirement": "Kill  harpies.",
+    "locked_text": "",
+    "type": "Default",
+    "flags": [
+      "Permanent"
+    ],
+    "tiers": [
+      {
+        "count": 10,
+        "points": 1
+      },
+      {
+        "count": 100,
+        "points": 5
+      },
+      {
+        "count": 500,
+        "points": 5
+      },
+      {
+        "count": 1000,
+        "points": 5
+      }
+    ]
+  },
+  {
+    "id": 740,
+    "name": "Aspect Arena Regular",
+    "description": "You must really like crystals.",
+    "requirement": "Participate in  round. Does not contribute to completing the meta-achievement.",
+    "locked_text": "",
+    "type": "Default",
+    "flags": [
+      "Pvp",
+      "Repeatable",
+      "Permanent"
+    ],
+    "tiers": [
+      {
+        "count": 12,
+        "points": 5
+      }
+    ],
+    "point_cap": 5,
+    "rewards": [
+      {
+        "type": "Item",
+        "id": 43913,
+        "count": 1
+      }
+    ]
+  },
+  {
+    "id": 546,
+    "name": "Scholar",
+    "description": "Make Moto proud.",
+    "requirement": "Complete Zone 1, Zone 2, and Zone 3 in World 1.",
+    "locked_text": "",
+    "type": "Default",
+    "flags": [
+      "Permanent"
+    ],
+    "bits": [
+      {
+        "type": "Text",
+        "text": "Zone 01"
+      },
+      {
+        "type": "Text",
+        "text": "Zone 02"
+      },
+      {
+        "type": "Text",
+        "text": "Zone 03"
+      }
+    ],
+    "tiers": [
+      {
+        "count": 3,
+        "points": 10
+      }
+    ]
+  },
+  {
+    "id": 67,
+    "name": "For the Legion!",
+    "description": "You brought heat to the Flame Legion.",
+    "requirement": "Complete the charr personal story step \"Deadly Force,\" \"Ghostbore Artillery,\" \"Operation: Bulwark,\" or \"Quick and Quiet.\"",
+    "locked_text": "",
+    "type": "Default",
+    "flags": [
+      "Permanent"
+    ],
+    "tiers": [
+      {
+        "count": 1,
+        "points": 10
+      }
+    ],
+    "rewards": [
+      {
+        "type": "Mastery",
+        "region": "Tyria",
+        "id": 208
+      }
+    ]
+  },
+  {
+    "id": 64,
+    "name": "Crime and Punishment",
+    "description": "Through valor and a thirst for justice, you earned Logan Thackeray's trust.",
+    "requirement": "Complete the human personal story step \"Breaking the Blade,\" \"The Commander,\" or \"The Trial of Julius Zamon.\"",
+    "locked_text": "",
+    "type": "Default",
+    "flags": [
+      "Permanent"
+    ],
+    "tiers": [
+      {
+        "count": 1,
+        "points": 10
+      }
+    ],
+    "rewards": [
+      {
+        "type": "Mastery",
+        "region": "Tyria",
+        "id": 208
+      }
+    ]
+  },
+  {
+    "id": 416,
+    "name": "Sylvari Surprise",
+    "description": "Tixx is opening a new branch.",
+    "requirement": "Help out at Tixx's workshop in the Grove.",
+    "locked_text": "",
+    "type": "Default",
+    "flags": [
+      "Permanent"
+    ],
+    "tiers": [
+      {
+        "count": 1,
+        "points": 5
+      }
+    ]
+  },
+  {
+    "id": 698,
+    "name": "Voyage to the Bazaar",
+    "description": "",
+    "requirement": "Arrive at the Bazaar of the Four Winds by taking a ship from Sanctum Harbor.",
+    "locked_text": "",
+    "type": "Default",
+    "flags": [
+      "Permanent"
+    ],
+    "tiers": [
+      {
+        "count": 1,
+        "points": 5
+      }
+    ]
+  },
+  {
+    "id": 861,
+    "name": "Tough Customer, World 1",
+    "description": "Hunting for adventure...and bargains.",
+    "requirement": "Visit every shop in World 1 in Tribulation Mode.",
+    "locked_text": "",
+    "type": "Default",
+    "flags": [
+      "Permanent"
+    ],
+    "bits": [
+      {
+        "type": "Text",
+        "text": "The mountain has a back door."
+      },
+      {
+        "type": "Text",
+        "text": "At last, a customer!"
+      },
+      {
+        "type": "Text",
+        "text": "Past the big hollow log."
+      },
+      {
+        "type": "Text",
+        "text": "Ground level, before a checkpoint."
+      },
+      {
+        "type": "Text",
+        "text": "This water tastes improper."
+      },
+      {
+        "type": "Text",
+        "text": "Many mushroom bounces."
+      },
+      {
+        "type": "Text",
+        "text": "Short waterfall."
+      },
+      {
+        "type": "Text",
+        "text": "Overlooking the swamp."
+      },
+      {
+        "type": "Text",
+        "text": "Behind a tree stump."
+      },
+      {
+        "type": "Text",
+        "text": "Right, before the king."
+      },
+      {
+        "type": "Text",
+        "text": "Inside the room."
+      }
+    ],
+    "tiers": [
+      {
+        "count": 1,
+        "points": 2
+      },
+      {
+        "count": 2,
+        "points": 2
+      },
+      {
+        "count": 3,
+        "points": 2
+      },
+      {
+        "count": 4,
+        "points": 2
+      },
+      {
+        "count": 5,
+        "points": 2
+      },
+      {
+        "count": 6,
+        "points": 2
+      },
+      {
+        "count": 7,
+        "points": 2
+      },
+      {
+        "count": 8,
+        "points": 2
+      },
+      {
+        "count": 9,
+        "points": 2
+      },
+      {
+        "count": 10,
+        "points": 2
+      },
+      {
+        "count": 11,
+        "points": 5
+      }
+    ]
+  },
+  {
+    "id": 1571,
+    "name": "Boss Blitz: Put Out Pyroxis",
+    "description": "",
+    "requirement": "Defeat Pyroxis during a Boss Blitz event in the Crown Pavilion.",
+    "locked_text": "",
+    "type": "Default",
+    "flags": [
+      "Pvp",
+      "Permanent"
+    ],
+    "tiers": [
+      {
+        "count": 1,
+        "points": 1
+      }
+    ]
+  },
+  {
+    "id": 1244,
+    "name": "Dolyak Defender",
+    "description": "This dolyak WILL make it to deliver the presents today.",
+    "requirement": "Survive Toypocalypse with at least one living gift dolyak.",
+    "locked_text": "",
+    "type": "Default",
+    "flags": [
+      "Pvp",
+      "Hidden",
+      "Permanent"
+    ],
+    "tiers": [
+      {
+        "count": 1,
+        "points": 5
+      }
+    ]
+  },
+  {
+    "id": 417,
+    "name": "Disaster Derailed",
+    "description": "Queen Jennah approved.",
+    "requirement": "Help out at Tixx's workshop in Divinity's Reach.",
+    "locked_text": "",
+    "type": "Default",
+    "flags": [
+      "Permanent"
+    ],
+    "tiers": [
+      {
+        "count": 1,
+        "points": 5
+      }
+    ]
+  },
+  {
+    "id": 6,
+    "name": "Spider Slayer",
+    "description": "They should have used their eight legs to run away from tougher fighters.",
+    "requirement": "Kill  spiders.",
+    "locked_text": "",
+    "type": "Default",
+    "flags": [
+      "Permanent"
+    ],
+    "tiers": [
+      {
+        "count": 10,
+        "points": 1
+      },
+      {
+        "count": 100,
+        "points": 5
+      },
+      {
+        "count": 500,
+        "points": 5
+      },
+      {
+        "count": 1000,
+        "points": 5
+      }
+    ]
+  },
+  {
+    "id": 1570,
+    "name": "Boss Blitz: Kill Kuraii",
+    "description": "",
+    "requirement": "Defeat Kuraii the Cruel during a Boss Blitz event in the Crown Pavilion.",
+    "locked_text": "",
+    "type": "Default",
+    "flags": [
+      "Pvp",
+      "Permanent"
+    ],
+    "tiers": [
+      {
+        "count": 1,
+        "points": 1
+      }
+    ]
+  },
+  {
+    "id": 649,
+    "name": "The Dragon Bash Experience",
+    "description": "",
+    "requirement": "You've gotten into the swing of Dragon Bash.",
+    "locked_text": "",
+    "type": "Default",
+    "flags": [
+      "Pvp",
+      "RepairOnLogin",
+      "CategoryDisplay",
+      "Permanent"
+    ],
+    "tiers": [
+      {
+        "count": 8,
+        "points": 50
+      }
+    ],
+    "rewards": [
+      {
+        "type": "Item",
+        "id": 43350,
+        "count": 1
+      }
+    ]
+  },
+  {
+    "id": 1245,
+    "name": "Ringing the Right Notes",
+    "description": "Part of the symphony.",
+    "requirement": "Play the correct notes in Bell Choir Ensemble.",
+    "locked_text": "",
+    "type": "Default",
+    "flags": [
+      "Pvp",
+      "Hidden",
+      "Permanent"
+    ],
+    "tiers": [
+      {
+        "count": 10,
+        "points": 1
+      },
+      {
+        "count": 100,
+        "points": 2
+      },
+      {
+        "count": 250,
+        "points": 2
+      },
+      {
+        "count": 500,
+        "points": 5
+      }
+    ]
+  },
+  {
+    "id": 1247,
+    "name": "Honorary Krewe Member",
+    "description": "You must be this smart to enter.",
+    "requirement": "Defeat Toxx in Tixx's workshop in Lion's Arch.",
+    "locked_text": "",
+    "type": "Default",
+    "flags": [
+      "Hidden",
+      "Permanent"
+    ],
+    "tiers": [
+      {
+        "count": 1,
+        "points": 5
+      }
+    ]
+  },
+  {
+    "id": 650,
+    "name": "Zhaitasty",
+    "description": "",
+    "requirement": "You've sampled—indulged in, really—the official candy of Dragon Bash.",
+    "locked_text": "",
+    "type": "Default",
+    "flags": [
+      "Permanent"
+    ],
+    "tiers": [
+      {
+        "count": 1,
+        "points": 1
+      },
+      {
+        "count": 25,
+        "points": 1
+      },
+      {
+        "count": 50,
+        "points": 2
+      },
+      {
+        "count": 150,
+        "points": 2
+      },
+      {
+        "count": 250,
+        "points": 6
+      }
+    ]
+  },
+  {
+    "id": 548,
+    "name": "Bachelor of Pioneering",
+    "description": "Left, left, left, left...wait a minute.",
+    "requirement": "Find the shortcut located in World 1, Zone 2.",
+    "locked_text": "",
+    "type": "Default",
+    "flags": [
+      "Permanent"
+    ],
+    "tiers": [
+      {
+        "count": 1,
+        "points": 5
+      }
+    ]
+  },
+  {
+    "id": 563,
+    "name": "Glutton for Punishment",
+    "description": "Serious fun amidst serious pain.",
+    "requirement": "Complete Zone 1, Zone 2, and Zone 3 in World 1 in Tribulation Mode.",
+    "locked_text": "",
+    "type": "Default",
+    "flags": [
+      "Permanent"
+    ],
+    "bits": [
+      {
+        "type": "Text",
+        "text": "Zone 01"
+      },
+      {
+        "type": "Text",
+        "text": "Zone 02"
+      },
+      {
+        "type": "Text",
+        "text": "Zone 03"
+      }
+    ],
+    "tiers": [
+      {
+        "count": 1,
+        "points": 25
+      },
+      {
+        "count": 2,
+        "points": 25
+      },
+      {
+        "count": 3,
+        "points": 25
+      }
+    ]
+  },
+  {
+    "id": 1246,
+    "name": "Wintersday Wrecking Ball",
+    "description": "Nothing a little tape and some glue can't fix.",
+    "requirement": "Destroy every miniature piece of Tixx's toy diorama in Tixx's Infinirarium. (Dungeon instance only; not in the Toypocalypse activity.)",
+    "locked_text": "",
+    "type": "Default",
+    "flags": [
+      "Hidden",
+      "Permanent"
+    ],
+    "tiers": [
+      {
+        "count": 1,
+        "points": 5
+      }
+    ]
+  },
+  {
+    "id": 696,
+    "name": "Bazaar Ambassador",
+    "description": "",
+    "requirement": "Complete  Bazaar of the Four Winds achievement.",
+    "locked_text": "",
+    "type": "Default",
+    "flags": [
+      "Pvp",
+      "CategoryDisplay",
+      "Permanent"
+    ],
+    "tiers": [
+      {
+        "count": 16,
+        "points": 50
+      }
+    ],
+    "rewards": [
+      {
+        "type": "Item",
+        "id": 43902,
+        "count": 1
+      }
+    ]
+  },
+  {
+    "id": 3,
+    "name": "Skritt Slayer",
+    "description": "Scrape these scavengers off the surface of Tyria.",
+    "requirement": "Kill  skritt.",
+    "locked_text": "",
+    "type": "Default",
+    "flags": [
+      "Permanent"
+    ],
+    "tiers": [
+      {
+        "count": 10,
+        "points": 1
+      },
+      {
+        "count": 100,
+        "points": 5
+      },
+      {
+        "count": 500,
+        "points": 5
+      },
+      {
+        "count": 1000,
+        "points": 5
+      }
+    ]
+  },
+  {
+    "id": 866,
+    "name": "Academic",
+    "description": "You are Moto's star pupil.",
+    "requirement": "Complete Zone 1, Zone 2, and Zone 3 in World 2.",
+    "locked_text": "",
+    "type": "Default",
+    "flags": [
+      "Permanent"
+    ],
+    "bits": [
+      {
+        "type": "Text",
+        "text": "Zone 01"
+      },
+      {
+        "type": "Text",
+        "text": "Zone 02"
+      },
+      {
+        "type": "Text",
+        "text": "Zone 03"
+      }
+    ],
+    "tiers": [
+      {
+        "count": 3,
+        "points": 10
+      }
+    ]
+  },
+  {
+    "id": 65,
+    "name": "Graduation Day",
+    "description": "Your brains and brawn were tested, and you stopped an Inquest plot.",
+    "requirement": "Complete the asura personal story step \"Gadd's Last Gizmo,\" \"Defusing the Problem,\" \"Here, There, Everywhere,\" or \"The Things We Do For Love.\"",
+    "locked_text": "",
+    "type": "Default",
+    "flags": [
+      "Permanent"
+    ],
+    "tiers": [
+      {
+        "count": 1,
+        "points": 10
+      }
+    ],
+    "rewards": [
+      {
+        "type": "Mastery",
+        "region": "Tyria",
+        "id": 208
+      }
+    ]
+  },
+  {
+    "id": 547,
+    "name": "Minor in Enhancement",
+    "description": "Outfitted for many adventures.",
+    "requirement": "Obtain all of the item upgrades found in World 1.",
+    "locked_text": "",
+    "type": "Default",
+    "flags": [
+      "Permanent"
+    ],
+    "bits": [
+      {
+        "type": "Text",
+        "text": "Digger"
+      },
+      {
+        "type": "Text",
+        "text": "Whip"
+      },
+      {
+        "type": "Text",
+        "text": "Candle"
+      },
+      {
+        "type": "Text",
+        "text": "Mini Bomb"
+      },
+      {
+        "type": "Text",
+        "text": "Moto's Breath"
+      },
+      {
+        "type": "Text",
+        "text": "Bauble Purse"
+      },
+      {
+        "type": "Text",
+        "text": "Heart Vessel"
+      }
+    ],
+    "tiers": [
+      {
+        "count": 7,
+        "points": 5
+      }
+    ]
+  },
+  {
+    "id": 859,
+    "name": "Tough Customer, World 2",
+    "description": "You keep these merchants in business.",
+    "requirement": "Visit every World 2 shop in Tribulation Mode.",
+    "locked_text": "",
+    "type": "Default",
+    "flags": [
+      "Permanent"
+    ],
+    "bits": [
+      {
+        "type": "Text",
+        "text": "Behind a gigantic waterfall."
+      },
+      {
+        "type": "Text",
+        "text": "After a wild ride."
+      },
+      {
+        "type": "Text",
+        "text": "Across the wide river."
+      },
+      {
+        "type": "Text",
+        "text": "Overlooking the wide river."
+      },
+      {
+        "type": "Text",
+        "text": "In the middle of trees."
+      },
+      {
+        "type": "Text",
+        "text": "Past the piranha pagoda."
+      },
+      {
+        "type": "Text",
+        "text": "Below the deadliest pagoda."
+      },
+      {
+        "type": "Text",
+        "text": "Travel by flower."
+      },
+      {
+        "type": "Text",
+        "text": "Tucked away after a checkpoint."
+      },
+      {
+        "type": "Text",
+        "text": "After performing, left."
+      },
+      {
+        "type": "Text",
+        "text": "The candle is too weak."
+      },
+      {
+        "type": "Text",
+        "text": "After performing, straight ahead."
+      }
+    ],
+    "tiers": [
+      {
+        "count": 1,
+        "points": 2
+      },
+      {
+        "count": 2,
+        "points": 2
+      },
+      {
+        "count": 3,
+        "points": 2
+      },
+      {
+        "count": 4,
+        "points": 2
+      },
+      {
+        "count": 5,
+        "points": 2
+      },
+      {
+        "count": 6,
+        "points": 2
+      },
+      {
+        "count": 7,
+        "points": 2
+      },
+      {
+        "count": 8,
+        "points": 2
+      },
+      {
+        "count": 9,
+        "points": 2
+      },
+      {
+        "count": 10,
+        "points": 2
+      },
+      {
+        "count": 11,
+        "points": 2
+      },
+      {
+        "count": 12,
+        "points": 3
+      }
+    ]
+  },
+  {
+    "id": 653,
+    "name": "Paper Dragon",
+    "description": "",
+    "requirement": "You've broken open a legion of dragon piñatas and feasted on the yummy treats inside.",
+    "locked_text": "",
+    "type": "Default",
+    "flags": [
+      "Permanent"
+    ],
+    "tiers": [
+      {
+        "count": 1,
+        "points": 1
+      },
+      {
+        "count": 25,
+        "points": 2
+      },
+      {
+        "count": 50,
+        "points": 3
+      },
+      {
+        "count": 100,
+        "points": 5
+      },
+      {
+        "count": 150,
+        "points": 5
+      }
+    ]
+  },
+  {
+    "id": 858,
+    "name": "Connoisseur of Pain",
+    "description": "When will it end?",
+    "requirement": "Complete Zone 1, Zone 2, and Zone 3 in World 2 in Tribulation Mode.",
+    "locked_text": "",
+    "type": "Default",
+    "flags": [
+      "Permanent"
+    ],
+    "bits": [
+      {
+        "type": "Text",
+        "text": "Zone 01"
+      },
+      {
+        "type": "Text",
+        "text": "Zone 02"
+      },
+      {
+        "type": "Text",
+        "text": "Zone 03"
+      }
+    ],
+    "tiers": [
+      {
+        "count": 1,
+        "points": 25
+      },
+      {
+        "count": 2,
+        "points": 25
+      },
+      {
+        "count": 3,
+        "points": 25
+      }
+    ]
+  },
+  {
+    "id": 651,
+    "name": "Burn Down The Dragons",
+    "description": "",
+    "requirement": "Took part in the new Dragon Bash tradition of the immolation of dragon effigies.",
+    "locked_text": "",
+    "type": "Default",
+    "flags": [
+      "Permanent"
+    ],
+    "tiers": [
+      {
+        "count": 1,
+        "points": 1
+      },
+      {
+        "count": 10,
+        "points": 1
+      },
+      {
+        "count": 25,
+        "points": 2
+      },
+      {
+        "count": 50,
+        "points": 4
+      }
+    ]
+  },
+  {
+    "id": 699,
+    "name": "Ascent to Zephyr Sanctum",
+    "description": "",
+    "requirement": "Speak to the Sun Adept, Wind Adept, Lightning Adept, Poyaqui, Evon Gnashblade, and Ellen Kiel on your way to Zephyr Sanctum.",
+    "locked_text": "",
+    "type": "Default",
+    "flags": [
+      "Permanent"
+    ],
+    "tiers": [
+      {
+        "count": 1,
+        "points": 1
+      },
+      {
+        "count": 3,
+        "points": 1
+      },
+      {
+        "count": 6,
+        "points": 1
+      }
+    ]
+  },
+  {
+    "id": 418,
+    "name": "Charitable Charr",
+    "description": "Now with twice the smoke and fire.",
+    "requirement": "Help out at Tixx's workshop in the Black Citadel.",
+    "locked_text": "",
+    "type": "Default",
+    "flags": [
+      "Permanent"
+    ],
+    "tiers": [
+      {
+        "count": 1,
+        "points": 5
+      }
+    ]
+  },
+  {
+    "id": 415,
+    "name": "Smash the Town",
+    "description": "Nothing a little tape and some glue can't fix.",
+    "requirement": "Destroy every miniature piece of Tixx's toy diorama. (Dungeon instance only; not in the Toypocalypse activity.)",
+    "locked_text": "",
+    "type": "Default",
+    "flags": [
+      "Permanent"
+    ],
+    "tiers": [
+      {
+        "count": 1,
+        "points": 5
+      }
+    ]
+  },
+  {
+    "id": 9,
+    "name": "Emergency Response Hero",
+    "description": "Always willing to lend a hand, or sword, for the common good. You go where the action is.",
+    "requirement": "Participate in  events.",
+    "locked_text": "",
+    "type": "Default",
+    "flags": [
+      "Permanent"
+    ],
+    "tiers": [
+      {
+        "count": 15,
+        "points": 5
+      },
+      {
+        "count": 100,
+        "points": 10
+      },
+      {
+        "count": 500,
+        "points": 10
+      },
+      {
+        "count": 2000,
+        "points": 10
+      },
+      {
+        "count": 5000,
+        "points": 10
+      }
+    ]
+  },
+  {
+    "id": 865,
+    "name": "Associate of Secrets, World 2",
+    "description": "Left no stone unturned.",
+    "requirement": "Find every hidden room (excluding furniture shops) in World 2, Zone 1.",
+    "locked_text": "",
+    "type": "Default",
+    "flags": [
+      "Permanent"
+    ],
+    "bits": [
+      {
+        "type": "Text",
+        "text": "After a wild ride."
+      },
+      {
+        "type": "Text",
+        "text": "Across the wide river."
+      },
+      {
+        "type": "Text",
+        "text": "Overlooking the wide river."
+      },
+      {
+        "type": "Text",
+        "text": "Behind a gigantic waterfall."
+      },
+      {
+        "type": "Text",
+        "text": "Left of a shop."
+      },
+      {
+        "type": "Text",
+        "text": "Inside a watery cave."
+      },
+      {
+        "type": "Text",
+        "text": "Ledge above river rapids."
+      },
+      {
+        "type": "Text",
+        "text": "Surrounded by trees."
+      },
+      {
+        "type": "Text",
+        "text": "Beneath the hillbillies."
+      },
+      {
+        "type": "Text",
+        "text": "Where water crashes down at the wide river."
+      },
+      {
+        "type": "Text",
+        "text": "Does the log have other secrets?"
+      }
+    ],
+    "tiers": [
+      {
+        "count": 11,
+        "points": 5
+      }
+    ]
+  },
+  {
+    "id": 867,
+    "name": "Associate of Baubles, World 2",
+    "description": "...and that one, too.",
+    "requirement": "Collect every World 2, Zone 1 bauble in one playthrough. Baubles from foes aren't counted.",
+    "locked_text": "",
+    "type": "Default",
+    "flags": [
+      "Permanent"
+    ],
+    "tiers": [
+      {
+        "count": 1,
+        "points": 5
+      }
+    ]
+  },
+  {
+    "id": 697,
+    "name": "Strangers from the Sky",
+    "description": "",
+    "requirement": "Head to Lion's Arch, and check in with Captain Magnus at the Main Haven Headquarters in Fort Marriner.",
+    "locked_text": "",
+    "type": "Default",
+    "flags": [
+      "Permanent"
+    ],
+    "tiers": [
+      {
+        "count": 1,
+        "points": 5
+      }
+    ]
+  },
+  {
+    "id": 1572,
+    "name": "Boss Blitz: Slay Shurakk",
+    "description": "",
+    "requirement": "Defeat Shurakk the Savage during a Boss Blitz event in the Crown Pavilion.",
+    "locked_text": "",
+    "type": "Default",
+    "flags": [
+      "Pvp",
+      "Permanent"
+    ],
+    "tiers": [
+      {
+        "count": 1,
+        "points": 1
+      }
+    ]
+  },
+  {
+    "id": 1573,
+    "name": "Boss Blitz: Wallop Wiggin",
+    "description": "",
+    "requirement": "Defeat Wiggin the Wicked during a Boss Blitz event in the Crown Pavilion.",
+    "locked_text": "",
+    "type": "Default",
+    "flags": [
+      "Pvp",
+      "Permanent"
+    ],
+    "tiers": [
+      {
+        "count": 1,
+        "points": 1
+      }
+    ]
+  },
+  {
+    "id": 857,
+    "name": "Explorer's Second Super Adventure",
+    "description": "Contemplate World 2's stunning horizons at your leisure.",
+    "requirement": "Complete feats by playing through Zone 1, Zone 2, and Zone 3 in World 2 in Exploration Mode.",
+    "locked_text": "",
+    "type": "Default",
+    "flags": [
+      "Permanent"
+    ],
+    "bits": [
+      {
+        "type": "Text",
+        "text": "Complete World 2, Zone 1 in Exploration Mode."
+      },
+      {
+        "type": "Text",
+        "text": "Complete World 2, Zone 2 in Exploration Mode."
+      },
+      {
+        "type": "Text",
+        "text": "Complete World 2, Zone 3 in Exploration Mode."
+      },
+      {
+        "type": "Text",
+        "text": "Zone 1—#9"
+      },
+      {
+        "type": "Text",
+        "text": "Zone 1—#2"
+      },
+      {
+        "type": "Text",
+        "text": "Zone 1—#4"
+      },
+      {
+        "type": "Text",
+        "text": "Zone 1—#5"
+      },
+      {
+        "type": "Text",
+        "text": "Zone 1—#7"
+      },
+      {
+        "type": "Text",
+        "text": "Zone 1—#8"
+      },
+      {
+        "type": "Text",
+        "text": "Zone 1—#3"
+      },
+      {
+        "type": "Text",
+        "text": "Zone 1—#6"
+      },
+      {
+        "type": "Text",
+        "text": "Zone 1—#1"
+      },
+      {
+        "type": "Text",
+        "text": "Zone 2—#11"
+      },
+      {
+        "type": "Text",
+        "text": "Zone 2—#2"
+      },
+      {
+        "type": "Text",
+        "text": "Zone 2—#3"
+      },
+      {
+        "type": "Text",
+        "text": "Zone 2—#4"
+      },
+      {
+        "type": "Text",
+        "text": "Zone 2—#5"
+      },
+      {
+        "type": "Text",
+        "text": "Zone 2—#6"
+      },
+      {
+        "type": "Text",
+        "text": "Zone 2—#7"
+      },
+      {
+        "type": "Text",
+        "text": "Zone 2—#8"
+      },
+      {
+        "type": "Text",
+        "text": "Zone 2—#9"
+      },
+      {
+        "type": "Text",
+        "text": "Zone 3—#9"
+      },
+      {
+        "type": "Text",
+        "text": "Zone 3—#2"
+      },
+      {
+        "type": "Text",
+        "text": "Zone 3—#3"
+      },
+      {
+        "type": "Text",
+        "text": "Zone 3—#4"
+      },
+      {
+        "type": "Text",
+        "text": "Zone 3—#5"
+      },
+      {
+        "type": "Text",
+        "text": "Zone 3—#6"
+      },
+      {
+        "type": "Text",
+        "text": "Zone 2—#10"
+      },
+      {
+        "type": "Text",
+        "text": "Zone 2—#1"
+      },
+      {
+        "type": "Text",
+        "text": "Zone 3—#7"
+      },
+      {
+        "type": "Text",
+        "text": "Zone 3—#8"
+      },
+      {
+        "type": "Text",
+        "text": "Zone 3—#10"
+      },
+      {
+        "type": "Text",
+        "text": "Zone 3—#1"
+      }
+    ],
+    "tiers": [
+      {
+        "count": 1,
+        "points": 0
+      },
+      {
+        "count": 2,
+        "points": 0
+      },
+      {
+        "count": 3,
+        "points": 0
+      },
+      {
+        "count": 4,
+        "points": 0
+      },
+      {
+        "count": 5,
+        "points": 0
+      },
+      {
+        "count": 6,
+        "points": 0
+      },
+      {
+        "count": 7,
+        "points": 0
+      },
+      {
+        "count": 8,
+        "points": 0
+      },
+      {
+        "count": 9,
+        "points": 0
+      },
+      {
+        "count": 10,
+        "points": 0
+      },
+      {
+        "count": 11,
+        "points": 0
+      },
+      {
+        "count": 12,
+        "points": 0
+      },
+      {
+        "count": 13,
+        "points": 0
+      },
+      {
+        "count": 14,
+        "points": 0
+      },
+      {
+        "count": 15,
+        "points": 0
+      },
+      {
+        "count": 16,
+        "points": 0
+      },
+      {
+        "count": 17,
+        "points": 0
+      },
+      {
+        "count": 18,
+        "points": 0
+      },
+      {
+        "count": 19,
+        "points": 0
+      },
+      {
+        "count": 20,
+        "points": 0
+      },
+      {
+        "count": 21,
+        "points": 0
+      },
+      {
+        "count": 22,
+        "points": 0
+      },
+      {
+        "count": 23,
+        "points": 0
+      },
+      {
+        "count": 24,
+        "points": 0
+      },
+      {
+        "count": 25,
+        "points": 0
+      },
+      {
+        "count": 26,
+        "points": 0
+      },
+      {
+        "count": 27,
+        "points": 0
+      },
+      {
+        "count": 28,
+        "points": 0
+      },
+      {
+        "count": 29,
+        "points": 0
+      },
+      {
+        "count": 30,
+        "points": 0
+      },
+      {
+        "count": 31,
+        "points": 0
+      },
+      {
+        "count": 32,
+        "points": 0
+      },
+      {
+        "count": 33,
+        "points": 1
+      }
+    ]
+  },
+  {
+    "id": 419,
+    "name": "Help in Hoelbrak",
+    "description": "Even more epic than elsewhere.",
+    "requirement": "Help out at Tixx's workshop in Hoelbrak.",
+    "locked_text": "",
+    "type": "Default",
+    "flags": [
+      "Permanent"
+    ],
+    "tiers": [
+      {
+        "count": 1,
+        "points": 5
+      }
+    ]
+  },
+  {
+    "id": 549,
+    "name": "Minor in Immortality",
+    "description": "Who needs continue coins?",
+    "requirement": "Complete any zone without dying.",
+    "locked_text": "",
+    "type": "Default",
+    "flags": [
+      "Permanent"
+    ],
+    "tiers": [
+      {
+        "count": 1,
+        "points": 5
+      }
+    ]
+  },
+  {
+    "id": 864,
+    "name": "Major in Achievement",
+    "description": "Your super adventure genius is unrivaled.",
+    "requirement": "Complete  achievement for World 2.",
+    "locked_text": "",
+    "type": "Default",
+    "flags": [
+      "CategoryDisplay",
+      "Permanent"
+    ],
+    "tiers": [
+      {
+        "count": 13,
+        "points": 15
+      }
+    ],
+    "rewards": [
+      {
+        "type": "Item",
+        "id": 46652,
+        "count": 1
+      },
+      {
+        "type": "Title",
+        "id": 174
+      }
+    ]
+  },
+  {
+    "id": 550,
+    "name": "Minor in Fortitude",
+    "description": "No time to take damage, a super adventure awaits!",
+    "requirement": "Complete any zone without using a health potion or dying.",
+    "locked_text": "",
+    "type": "Default",
+    "flags": [
+      "Permanent"
+    ],
+    "tiers": [
+      {
+        "count": 1,
+        "points": 5
+      }
+    ]
+  },
+  {
+    "id": 66,
+    "name": "Rising to the Challenge",
+    "description": "Today, you proved your strength by stopping a threat to the lodge.",
+    "requirement": "Complete the norn personal story step \"Minotaur Rampant,\" \"The Last of the Giant-Kings,\" or \"The Wolf Havroun.\"",
+    "locked_text": "",
+    "type": "Default",
+    "flags": [
+      "Permanent"
+    ],
+    "tiers": [
+      {
+        "count": 1,
+        "points": 10
+      }
+    ],
+    "rewards": [
+      {
+        "type": "Mastery",
+        "region": "Tyria",
+        "id": 208
+      }
+    ]
+  },
+  {
+    "id": 5,
+    "name": "Drake Slayer",
+    "description": "Enough of these massive drakes on Tyria's massive plains.",
+    "requirement": "Kill  drakes.",
+    "locked_text": "",
+    "type": "Default",
+    "flags": [
+      "Permanent"
+    ],
+    "tiers": [
+      {
+        "count": 10,
+        "points": 1
+      },
+      {
+        "count": 100,
+        "points": 5
+      },
+      {
+        "count": 500,
+        "points": 5
+      },
+      {
+        "count": 1000,
+        "points": 5
+      }
+    ]
+  },
+  {
+    "id": 652,
+    "name": "Color the Sky",
+    "description": "",
+    "requirement": "You painted the sky with some Tyrian pyrotechnics.",
+    "locked_text": "",
+    "type": "Default",
+    "flags": [
+      "Permanent"
+    ],
+    "tiers": [
+      {
+        "count": 1,
+        "points": 1
+      },
+      {
+        "count": 25,
+        "points": 1
+      },
+      {
+        "count": 50,
+        "points": 2
+      },
+      {
+        "count": 75,
+        "points": 2
+      },
+      {
+        "count": 100,
+        "points": 5
+      }
+    ]
+  },
+  {
+    "id": 700,
+    "name": "Lessons from the Sky",
+    "description": "",
+    "requirement": "Find and activate sky crystals throughout Labyrinthine Cliffs.",
+    "locked_text": "",
+    "type": "Default",
+    "flags": [
+      "Permanent"
+    ],
+    "tiers": [
+      {
+        "count": 1,
+        "points": 1
+      },
+      {
+        "count": 5,
+        "points": 5
+      },
+      {
+        "count": 10,
+        "points": 5
+      },
+      {
+        "count": 20,
+        "points": 5
+      },
+      {
+        "count": 40,
+        "points": 10
+      }
+    ],
+    "rewards": [
+      {
+        "type": "Item",
+        "id": 43901,
+        "count": 1
+      }
+    ]
+  }
+]
