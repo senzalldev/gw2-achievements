@@ -251,7 +251,10 @@ async function exportPng() {
     const name = (props.accountInfo?.name ?? 'account').replace(/\./g, '-')
     link.download = `gw2-stats-${name}.png`
     link.href = canvas.toDataURL('image/png')
+    link.style.display = 'none'
+    document.body.appendChild(link)
     link.click()
+    document.body.removeChild(link)
   } catch (e) {
     console.error('Export failed', e)
   } finally {
