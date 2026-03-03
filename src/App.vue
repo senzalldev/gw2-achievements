@@ -17,7 +17,7 @@
     <div class="text-center">
       <div class="text-5xl mb-4 animate-spin">⚙️</div>
       <p class="text-amber-400 font-semibold text-lg">{{ loadingStage }}</p>
-      <p class="text-slate-500 text-sm mt-1">This may take a moment for large accounts...</p>
+      <p class="text-slate-500 text-sm mt-1">Talking to the GW2 API — won't be long...</p>
     </div>
   </div>
 
@@ -27,8 +27,9 @@
     <header class="bg-slate-800 border-b border-slate-700 px-4 py-3 sm:px-6 sm:py-4">
       <div class="max-w-7xl mx-auto flex items-center justify-between flex-wrap gap-3">
         <div>
-          <div class="flex items-center gap-2">
+          <div class="flex items-center gap-2 flex-wrap">
             <h1 class="text-xl font-bold text-amber-400">⚔️ GW2 Achievement Tracker</h1>
+            <span class="text-xs bg-purple-900/50 text-purple-400 border border-purple-700/50 px-1.5 py-0.5 rounded font-medium">Experimental</span>
           </div>
           <p class="text-sm text-slate-400">
             {{ accountInfo?.name }}
@@ -113,18 +114,35 @@
       </div>
     </nav>
 
+    <!-- Content filters — hidden on tabs that don't use achievement data -->
+    <FilterBar v-if="!['daily', 'masteries', 'about', 'browse'].includes(activeTab)" />
+
+    <!-- Background data loading notice -->
+    <div
+      v-if="!gameStatsReady"
+      class="bg-slate-800/60 border-b border-slate-700/40 px-4 sm:px-6 py-1.5"
+    >
+      <div class="max-w-7xl mx-auto flex items-center gap-2">
+        <span class="inline-block w-2 h-2 rounded-full bg-amber-400 animate-pulse shrink-0"></span>
+        <span class="text-xs text-slate-400">
+          Loading full game data in the background — AP totals and "Not Started" counts will update when ready
+        </span>
+      </div>
+    </div>
+
     <!-- Main content -->
     <main class="max-w-7xl mx-auto px-4 sm:px-6 py-6 space-y-6">
 
       <!-- Overview tab -->
       <template v-if="activeTab === 'overview'">
-        <StatsCards :stats="stats" />
+        <StatsCards :stats="filteredStats" :actual-total-points="stats.totalPoints" />
 
         <!-- Donut + action cards side by side -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <StatusDonut
-            :done="stats.done"
-            :in-progress="stats.inProgress"
+            :done="filteredStats.done"
+            :in-progress="filteredStats.inProgress"
+            :not-started="filteredStats.notStarted"
             @select="jumpToStatus"
           />
           <div class="flex flex-col gap-4">
@@ -134,7 +152,7 @@
             >
               <div class="text-2xl mb-2">🏃</div>
               <div class="font-semibold text-white group-hover:text-amber-300 transition-colors">Almost Done</div>
-              <div class="text-xs text-slate-400 mt-1">{{ almostDone.length }} achievements near completion</div>
+              <div class="text-xs text-slate-400 mt-1">{{ filteredAlmostDone.length }} achievements near completion</div>
             </button>
             <button
               @click="activeTab = 'mostvaluable'"
@@ -142,13 +160,13 @@
             >
               <div class="text-2xl mb-2">💎</div>
               <div class="font-semibold text-white group-hover:text-purple-300 transition-colors">Most Valuable</div>
-              <div class="text-xs text-slate-400 mt-1">{{ mostValuable.length }} achievements with the most AP left</div>
+              <div class="text-xs text-slate-400 mt-1">{{ filteredMostValuable.length }} achievements with the most AP left</div>
             </button>
           </div>
         </div>
 
         <!-- Full-width bar chart -->
-        <CategoryPointsChart :category-stats="categoryStats" @select="jumpToCategory" />
+        <CategoryPointsChart :category-stats="filteredCategoryStats" @select="jumpToCategory" />
 
         <!-- About link -->
         <button
@@ -168,10 +186,11 @@
       <!-- My Stats tab -->
       <template v-if="activeTab === 'stats'">
         <MyStatsTab
-          :achievements="enrichedAchievements"
-          :category-stats="categoryStats"
+          :achievements="filteredAchievements"
+          :never-started="filteredNeverStarted"
+          :category-stats="filteredCategoryStats"
           :account-info="accountInfo"
-          :stats="stats"
+          :stats="filteredStats"
           :game-stats-ready="gameStatsReady"
         />
       </template>
@@ -179,7 +198,7 @@
       <!-- Almost Done tab -->
       <template v-if="activeTab === 'almostdone'">
         <AlmostDone
-          :items="almostDone"
+          :items="filteredAlmostDone"
           :bit-names-cache="bitNamesCache"
           :resolve-bit-names="resolveBitNames"
           @select="jumpToAchievement"
@@ -189,7 +208,7 @@
       <!-- Most Valuable tab -->
       <template v-if="activeTab === 'mostvaluable'">
         <MostValuable
-          :items="mostValuable"
+          :items="filteredMostValuable"
           :bit-names-cache="bitNamesCache"
           :resolve-bit-names="resolveBitNames"
           @select="jumpToAchievement"
@@ -199,7 +218,7 @@
       <!-- Goals tab -->
       <template v-if="activeTab === 'goals'">
         <GoalsTab
-          :achievements="enrichedAchievements"
+          :achievements="filteredAchievements"
           :bit-names-cache="bitNamesCache"
           :resolve-bit-names="resolveBitNames"
           :api-key="savedKey"
@@ -226,12 +245,12 @@
               title="Clear search"
             >×</button>
           </div>
-          <div v-if="filteredCategoryStats.length === 0" class="text-slate-500 text-sm text-center py-6">
+          <div v-if="searchedCategoryStats.length === 0" class="text-slate-500 text-sm text-center py-6">
             No categories match "{{ categorySearch }}".
           </div>
           <div class="space-y-3">
             <div
-              v-for="cat in filteredCategoryStats"
+              v-for="cat in searchedCategoryStats"
               :key="cat.category.id"
               class="bg-slate-700/40 rounded-lg p-4 hover:bg-slate-700/70 transition-colors cursor-pointer"
               @click="jumpToCategory(cat.category.id)"
@@ -259,7 +278,7 @@
       <!-- Browse tab -->
       <template v-if="activeTab === 'browse'">
         <AchievementList
-          :achievements="enrichedAchievements"
+          :achievements="statsAchievements"
           :categories="allCategories"
           :sorted-groups="sortedGroups"
           :category-to-group="categoryToGroup"
@@ -308,6 +327,7 @@ import { ref, computed, onMounted } from 'vue'
 import { APP_VERSION } from './version'
 import { useAchievements } from './composables/useAchievements'
 import type { CategoryStats, EnrichedAchievement } from './composables/useAchievements'
+import { useContentFilter } from './composables/useContentFilter'
 import type { SavedAccount } from './types/gw2'
 import ApiKeyInput from './components/ApiKeyInput.vue'
 import StatsCards from './components/StatsCards.vue'
@@ -321,18 +341,92 @@ import DailyAchievements from './components/DailyAchievements.vue'
 import MasteryProgress from './components/MasteryProgress.vue'
 import AboutTab from './components/AboutTab.vue'
 import MyStatsTab from './components/MyStatsTab.vue'
+import FilterBar from './components/FilterBar.vue'
 
 const {
   accountInfo, loading, error, loadingStage, savedKey,
   savedAccounts, removeAccount,
   bitNamesCache, resolveBitNames,
-  enrichedAchievements, stats, categoryStats, almostDone, mostValuable,
+  enrichedAchievements, neverStartedEnriched, stats,
   categoryToGroup, sortedGroups,
   gameStatsReady,
   loadData, reset,
 } = useAchievements()
 
-const allCategories = computed(() => categoryStats.value.map(cs => cs.category))
+const { statsFilterFn, listFilterFn } = useContentFilter()
+
+// List filtering — includes festival chips (hides items from lists but not from totals)
+const filteredAchievements = computed(() => enrichedAchievements.value.filter(listFilterFn.value))
+const filteredNeverStarted = computed(() => neverStartedEnriched.value.filter(listFilterFn.value))
+
+// Stats filtering — PvP/WvW/HoM only; festivals don't touch totals
+const statsAchievements = computed(() => enrichedAchievements.value.filter(statsFilterFn.value))
+const statsNeverStarted = computed(() => neverStartedEnriched.value.filter(statsFilterFn.value))
+const filteredAlmostDone = computed(() =>
+  filteredAchievements.value
+    .filter(a => !a.account.done && a.progressPercent >= 25)
+    .sort((a, b) => b.progressPercent - a.progressPercent)
+    .slice(0, 25)
+)
+const filteredMostValuable = computed(() =>
+  filteredAchievements.value
+    .filter(a => !a.account.done && (a.totalPoints - a.earnedPoints) > 0)
+    .sort((a, b) => (b.totalPoints - b.earnedPoints) - (a.totalPoints - a.earnedPoints))
+    .slice(0, 20)
+)
+
+// Filtered stats — counts and AP totals adjusted to selected modes only.
+// Chest tracker uses the real total AP (actualTotalPoints) since chests come from
+// your overall AP regardless of mode.
+const filteredStats = computed(() => {
+  const touched = statsAchievements.value
+  const untouched = statsNeverStarted.value // grows as background fetch completes
+  const done = touched.filter(a => a.account.done).length
+  const inProgress = touched.filter(a => !a.account.done && (a.account.current ?? 0) > 0).length
+  const totalInGame = touched.length + untouched.length
+  const notStarted = Math.max(0, totalInGame - done - inProgress)
+  const dailyMonthlyAp = stats.value.dailyMonthlyAp
+  // Exclude Daily/Weekly/Monthly-flagged and WvW-mode achievements — their AP is already
+  // captured in daily_ap / monthly_ap on the account endpoint.
+  const permanentAp = touched
+    .filter(a => a.mode !== 'wvw' && !a.detail.flags?.some(f => ['Daily', 'Weekly', 'Monthly'].includes(f)))
+    .reduce((s, a) => s + a.earnedPoints, 0)
+  const totalPoints = permanentAp + dailyMonthlyAp
+  // Max AP = sum of totalPoints across all filtered achievements (touched + never-started)
+  const permanentMaxAp = [...touched, ...untouched].reduce((s, a) => s + a.totalPoints, 0)
+  const maxPoints = permanentMaxAp + 15000
+  return {
+    done, inProgress, notStarted,
+    total: touched.length,
+    totalInGame,
+    totalPoints,
+    maxPoints,
+    permanentAp,
+    permanentMaxAp,
+    dailyMonthlyAp,
+  }
+})
+
+// categoryStats for chart display — uses list-filtered achievements so festival chips
+// remove those category bars, while the stats cards (filteredStats) use statsAchievements
+// and are unaffected by festival chips.
+const filteredCategoryStats = computed<CategoryStats[]>(() => {
+  const map = new Map<number, CategoryStats>()
+  for (const ea of filteredAchievements.value) {
+    if (!ea.category) continue
+    if (!map.has(ea.category.id)) {
+      map.set(ea.category.id, { category: ea.category, done: 0, inProgress: 0, earnedPoints: 0, totalPoints: 0 })
+    }
+    const s = map.get(ea.category.id)!
+    if (ea.account.done) s.done++
+    else if ((ea.account.current ?? 0) > 0) s.inProgress++
+    s.earnedPoints += ea.earnedPoints
+    s.totalPoints += ea.totalPoints
+  }
+  return Array.from(map.values()).sort((a, b) => b.earnedPoints - a.earnedPoints)
+})
+
+const allCategories = computed(() => filteredCategoryStats.value.map(cs => cs.category))
 
 const activeTab = ref<'overview' | 'stats' | 'almostdone' | 'mostvaluable' | 'goals' | 'categories' | 'browse' | 'daily' | 'masteries' | 'about'>('overview')
 const presetCategory = ref<number | ''>('')
@@ -342,10 +436,10 @@ const categorySearch = ref('')
 const accountsOpen = ref(false)
 const loginOpenOnForm = ref(false)
 
-const filteredCategoryStats = computed(() => {
+const searchedCategoryStats = computed(() => {
   const q = categorySearch.value.toLowerCase().trim()
-  if (!q) return categoryStats.value
-  return categoryStats.value.filter(cat => cat.category.name.toLowerCase().includes(q))
+  if (!q) return filteredCategoryStats.value
+  return filteredCategoryStats.value.filter(cat => cat.category.name.toLowerCase().includes(q))
 })
 
 const tabs = [
@@ -372,7 +466,7 @@ function jumpToCategory(catId: number) {
   activeTab.value = 'browse'
 }
 
-function jumpToStatus(status: 'done' | 'inprogress') {
+function jumpToStatus(status: 'done' | 'inprogress' | 'notstarted') {
   presetCategory.value = ''
   presetSearch.value = ''
   presetStatus.value = status

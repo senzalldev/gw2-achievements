@@ -82,7 +82,10 @@ export function calculateEarnedPoints(account: AccountAchievement, detail: Achie
 
   // Repeatable achievements with a cap: AP comes from all completed cycles, not just the current one
   if (detail.point_cap != null && detail.flags?.includes('Repeatable')) {
-    const timesCompleted = (account.repeated ?? 0) + (account.done ? 1 : 0)
+    // GW2 API: `repeated` is the TOTAL number of completions (not extra beyond the first).
+    // Do NOT add +1 for done — that was double-counting the first completion.
+    // Fall back to 1 if done=true but `repeated` is absent (old API data edge case).
+    const timesCompleted = account.repeated ?? (account.done ? 1 : 0)
     return Math.min(timesCompleted * apPerCompletion, detail.point_cap)
   }
 
@@ -245,12 +248,17 @@ export function useAchievements() {
     // notStarted = every achievement in the game the user has not completed or started.
     // This includes achievements the API never returned (truly never touched).
     const notStarted = Math.max(0, totalInGame - done - inProgress)
-    // The achievement list already includes daily/monthly AP (those are repeatable achievements
-    // in the list). daily_ap + monthly_ap from account info is a breakdown of that same AP,
-    // not an additional source — adding it separately causes double-counting.
-    const totalPoints = enrichedAchievements.value.reduce((s, a) => s + a.earnedPoints, 0)
+    // Achievements with Daily/Weekly/Monthly flags are rotating — their cumulative AP is
+    // already captured in daily_ap / monthly_ap on the account endpoint. Exclude them from
+    // permanentAp to avoid double-counting.
+    // WvW-mode achievements are also excluded: GW2 counts their AP in daily_ap regardless
+    // of the Permanent flag (empirically verified — WvW tier-completion AP matches the
+    // daily_ap pool exactly in live account data).
     const dailyMonthlyAp = (accountInfo.value?.daily_ap ?? 0) + (accountInfo.value?.monthly_ap ?? 0)
-    const permanentAp = totalPoints - dailyMonthlyAp  // non-daily component, for breakdown display
+    const permanentAp = enrichedAchievements.value
+      .filter(a => a.mode !== 'wvw' && !a.detail.flags?.some(f => ['Daily', 'Weekly', 'Monthly'].includes(f)))
+      .reduce((s, a) => s + a.earnedPoints, 0)
+    const totalPoints = permanentAp + dailyMonthlyAp
     // GW2 wiki: daily/monthly AP hard-capped at 15,000 total.
     // gameMaxAchievementPoints starts as user's tracked AP and grows to the full game max
     // once the background fetch settles.

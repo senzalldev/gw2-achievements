@@ -71,16 +71,16 @@ describe('calculateEarnedPoints', () => {
     expect(calculateEarnedPoints(account, detail)).toBe(50)
   })
 
-  // Repeatable + point_cap: repeated=2, done=true → 3 * apPerCompletion (under cap)
-  it('counts repeated cycles: repeated=2, done=true → 3x apPerCompletion', () => {
+  // Repeatable + point_cap: repeated=2 means completed 2 times total (GW2 API semantics)
+  it('counts repeated cycles: repeated=2, done=true → 2x apPerCompletion', () => {
     const account = makeAccount({ done: true, repeated: 2 })
     const detail = makeDetail({
       flags: ['Repeatable'],
       tiers: [{ count: 1, points: 10 }],
       point_cap: 50,
     })
-    // timesCompleted = 2 + 1 = 3; 3 * 10 = 30; min(30, 50) = 30
-    expect(calculateEarnedPoints(account, detail)).toBe(30)
+    // GW2 `repeated` = total completions; timesCompleted = 2; 2 * 10 = 20; min(20, 50) = 20
+    expect(calculateEarnedPoints(account, detail)).toBe(20)
   })
 
   // Repeatable + point_cap: over cap → returns point_cap exactly
