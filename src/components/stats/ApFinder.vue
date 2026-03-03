@@ -34,41 +34,54 @@
         <div v-if="bucket.items.length === 0" class="text-slate-500 text-sm text-center py-8">
           {{ bucket.emptyText }}
         </div>
-        <div v-else class="divide-y divide-slate-700/30">
-          <div
-            v-for="item in bucket.items"
-            :key="item.account.id"
-            class="flex items-center gap-3 p-3 hover:bg-slate-700/30 transition-colors"
-          >
-            <div class="flex-1 min-w-0">
-              <div class="flex items-center gap-2 flex-wrap">
-                <span class="text-sm text-white">{{ item.detail.name }}</span>
-                <span
-                  v-if="item.category"
-                  class="text-xs bg-slate-600/60 text-amber-300 px-1.5 py-0.5 rounded shrink-0"
-                >{{ item.category.name }}</span>
-              </div>
-              <div v-if="item.progressPercent > 0" class="flex items-center gap-2 mt-1">
-                <div class="flex-1 bg-slate-600 rounded-full h-1">
-                  <div
-                    class="h-1 rounded-full bg-sky-500"
-                    :style="{ width: item.progressPercent + '%' }"
-                  ></div>
+        <template v-else>
+          <template v-for="group in groupByMode(bucket.items)" :key="group.mode">
+            <!-- Mode subheader — only shown when there's more than one mode present -->
+            <div
+              v-if="hasMultipleModes(bucket.items)"
+              class="flex items-center gap-2 px-3 py-1.5 bg-slate-900/30 border-b border-slate-700/30"
+            >
+              <span class="text-xs">{{ group.icon }}</span>
+              <span class="text-xs font-semibold text-slate-400 uppercase tracking-wide">{{ group.label }}</span>
+              <span class="text-xs text-slate-600">{{ group.items.length }}</span>
+            </div>
+            <div class="divide-y divide-slate-700/30">
+              <div
+                v-for="item in group.items"
+                :key="item.account.id"
+                class="flex items-center gap-3 p-3 hover:bg-slate-700/30 transition-colors"
+              >
+                <div class="flex-1 min-w-0">
+                  <div class="flex items-center gap-2 flex-wrap">
+                    <span class="text-sm text-white">{{ item.detail.name }}</span>
+                    <span
+                      v-if="item.category"
+                      class="text-xs bg-slate-600/60 text-amber-300 px-1.5 py-0.5 rounded shrink-0"
+                    >{{ item.category.name }}</span>
+                  </div>
+                  <div v-if="item.progressPercent > 0" class="flex items-center gap-2 mt-1">
+                    <div class="flex-1 bg-slate-600 rounded-full h-1">
+                      <div
+                        class="h-1 rounded-full bg-sky-500"
+                        :style="{ width: item.progressPercent + '%' }"
+                      ></div>
+                    </div>
+                    <span class="text-xs text-slate-500">{{ item.progressPercent }}%</span>
+                  </div>
+                  <p
+                    v-if="item.detail.requirement"
+                    class="text-xs text-slate-500 mt-0.5 truncate"
+                  >{{ item.detail.requirement }}</p>
                 </div>
-                <span class="text-xs text-slate-500">{{ item.progressPercent }}%</span>
-              </div>
-              <p
-                v-if="item.detail.requirement"
-                class="text-xs text-slate-500 mt-0.5 truncate"
-              >{{ item.detail.requirement }}</p>
-            </div>
-            <div class="text-right shrink-0">
-              <div class="text-sm font-bold text-purple-400">
-                {{ (item.totalPoints - item.earnedPoints).toLocaleString() }} AP
+                <div class="text-right shrink-0">
+                  <div class="text-sm font-bold text-purple-400">
+                    {{ (item.totalPoints - item.earnedPoints).toLocaleString() }} AP
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
-        </div>
+          </template>
+        </template>
       </div>
     </div>
   </div>
@@ -76,14 +89,15 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import type { EnrichedAchievement } from '../../composables/useAchievements'
+import type { EnrichedAchievement, AchievementMode } from '../../composables/useAchievements'
 
 const props = defineProps<{
   achievements: EnrichedAchievement[]
+  neverStarted: EnrichedAchievement[]
   doneIds: Set<number>
 }>()
 
-const open = ref(new Set<string>(['quick']))
+const open = ref(new Set<string>())
 
 function toggle(id: string) {
   if (open.value.has(id)) {
@@ -94,28 +108,57 @@ function toggle(id: string) {
   open.value = new Set(open.value)
 }
 
-// Quick wins: not started, no prerequisites required (truly standalone, highest AP)
-const quickWins = computed(() =>
-  props.achievements
-    .filter(a => {
-      if (a.account.done || (a.account.current ?? 0) > 0) return false
-      return !a.detail.prerequisites?.length
-    })
-    .sort((a, b) => (b.totalPoints - b.earnedPoints) - (a.totalPoints - a.earnedPoints))
-    .slice(0, 15)
-)
+const MODE_META: Record<AchievementMode, { icon: string; label: string; order: number }> = {
+  pve:      { icon: '⚔️',  label: 'PvE',               order: 0 },
+  pvp:      { icon: '🏆',  label: 'PvP',               order: 1 },
+  wvw:      { icon: '🗡️',  label: 'WvW',               order: 2 },
+  festival: { icon: '🎪',  label: 'Festival',           order: 3 },
+  hom:      { icon: '🏛️',  label: 'Hall of Monuments', order: 4 },
+}
 
-// Almost unlocked: not started, has prerequisites, and ALL prerequisites are done
-const almostUnlocked = computed(() =>
-  props.achievements
-    .filter(a => {
-      if (a.account.done || (a.account.current ?? 0) > 0) return false
-      if (!a.detail.prerequisites?.length) return false
-      return a.detail.prerequisites.every(id => props.doneIds.has(id))
-    })
-    .sort((a, b) => (b.totalPoints - b.earnedPoints) - (a.totalPoints - a.earnedPoints))
+function groupByMode(items: EnrichedAchievement[]) {
+  const map = new Map<AchievementMode, EnrichedAchievement[]>()
+  for (const item of items) {
+    const existing = map.get(item.mode)
+    if (existing) existing.push(item)
+    else map.set(item.mode, [item])
+  }
+  return [...map.entries()]
+    .sort(([a], [b]) => MODE_META[a].order - MODE_META[b].order)
+    .map(([mode, modeItems]) => ({ mode, items: modeItems, ...MODE_META[mode] }))
+}
+
+function hasMultipleModes(items: EnrichedAchievement[]): boolean {
+  const modes = new Set(items.map(i => i.mode))
+  return modes.size > 1
+}
+
+// Quick wins: truly never started, no prerequisites (uses background-fetched full set)
+const quickWins = computed(() => {
+  // Also include touched-but-0-progress achievements with no prerequisites
+  const fromTouched = props.achievements.filter(a =>
+    !a.account.done && (a.account.current ?? 0) === 0 && !a.detail.prerequisites?.length
+  )
+  return [...props.neverStarted.filter(a => !a.detail.prerequisites?.length), ...fromTouched]
+    .sort((a, b) => b.totalPoints - a.totalPoints)
     .slice(0, 15)
-)
+})
+
+// Almost unlocked: never started, has prerequisites, ALL prerequisites are done
+const almostUnlocked = computed(() => {
+  const fromTouched = props.achievements.filter(a => {
+    if (a.account.done || (a.account.current ?? 0) > 0) return false
+    if (!a.detail.prerequisites?.length) return false
+    return a.detail.prerequisites.every(id => props.doneIds.has(id))
+  })
+  const fromNever = props.neverStarted.filter(a => {
+    if (!a.detail.prerequisites?.length) return false
+    return a.detail.prerequisites.every(id => props.doneIds.has(id))
+  })
+  return [...fromNever, ...fromTouched]
+    .sort((a, b) => b.totalPoints - a.totalPoints)
+    .slice(0, 15)
+})
 
 // Deep digs: in progress with meaningful AP remaining, sorted by AP remaining
 const deepDigs = computed(() =>

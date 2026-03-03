@@ -1,13 +1,23 @@
 <template>
   <div class="bg-slate-800 rounded-xl p-5 border border-slate-700">
-    <h3 class="font-semibold text-white mb-4">Achievement Status</h3>
+    <h3 class="font-semibold text-white mb-1">Achievement Status</h3>
     <p class="text-xs text-slate-500 mb-3">Click a segment to browse those achievements.</p>
     <div class="h-56">
       <Doughnut :data="chartData" :options="chartOptions" />
     </div>
-    <div class="flex justify-center gap-4 mt-3 text-xs text-slate-400">
-      <span class="flex items-center gap-1"><span class="w-3 h-3 rounded-full bg-emerald-500 inline-block"></span> Done</span>
-      <span class="flex items-center gap-1"><span class="w-3 h-3 rounded-full bg-amber-400 inline-block"></span> In Progress</span>
+    <div class="flex justify-center gap-4 mt-3 text-xs text-slate-400 flex-wrap">
+      <span class="flex items-center gap-1.5">
+        <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block shrink-0"></span>
+        Done <span class="text-slate-500">({{ done.toLocaleString() }})</span>
+      </span>
+      <span class="flex items-center gap-1.5">
+        <span class="w-2.5 h-2.5 rounded-full bg-amber-400 inline-block shrink-0"></span>
+        In Progress <span class="text-slate-500">({{ inProgress.toLocaleString() }})</span>
+      </span>
+      <span class="flex items-center gap-1.5">
+        <span class="w-2.5 h-2.5 rounded-full bg-slate-600 inline-block shrink-0"></span>
+        Not Started <span class="text-slate-500">({{ notStarted.toLocaleString() }})</span>
+      </span>
     </div>
   </div>
 </template>
@@ -23,19 +33,23 @@ ChartJS.register(ArcElement, Tooltip, Legend)
 const props = defineProps<{
   done: number
   inProgress: number
+  notStarted: number
 }>()
 
-const emit = defineEmits<{ select: [status: 'done' | 'inprogress'] }>()
+const emit = defineEmits<{ select: [status: 'done' | 'inprogress' | 'notstarted'] }>()
 
-const statusMap = ['done', 'inprogress'] as const
+const statusMap = ['done', 'inprogress', 'notstarted'] as const
+
+const total = computed(() => props.done + props.inProgress + props.notStarted)
 
 const chartData = computed(() => ({
-  labels: ['Completed', 'In Progress'],
+  labels: ['Completed', 'In Progress', 'Not Started'],
   datasets: [{
-    data: [props.done, props.inProgress],
-    backgroundColor: ['#10b981', '#f59e0b'],
+    data: [props.done, props.inProgress, props.notStarted],
+    backgroundColor: ['#10b981', '#f59e0b', '#334155'],
     borderColor: ['#0f172a'],
     borderWidth: 2,
+    hoverOffset: 4,
   }],
 }))
 
@@ -46,9 +60,8 @@ const chartOptions = computed(() => ({
     legend: { display: false },
     tooltip: {
       callbacks: {
-        label: (ctx: { label: string; parsed: number; dataset: { data: number[] } }) => {
-          const total = ctx.dataset.data.reduce((a: number, b: number) => a + b, 0)
-          const pct = total > 0 ? Math.round((ctx.parsed / total) * 100) : 0
+        label: (ctx: { label: string; parsed: number }) => {
+          const pct = total.value > 0 ? Math.round((ctx.parsed / total.value) * 100) : 0
           return ` ${ctx.label}: ${ctx.parsed.toLocaleString()} (${pct}%)`
         },
       },

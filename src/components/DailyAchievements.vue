@@ -25,24 +25,28 @@
         reset-label="Resets at 00:00 UTC"
         :all-ids="allBosses" :done-ids="doneBosses" :name-map="WORLD_BOSS_NAMES"
         :collapse-signal="collapseAll"
+        wiki-url="https://wiki.guildwars2.com/wiki/World_boss"
       />
       <SimpleChecklist
         title="Map Chests" icon="🗺️"
         reset-label="Resets at 00:00 UTC"
         :all-ids="ALL_MAP_CHEST_IDS" :done-ids="doneChests" :name-map="MAP_CHEST_NAMES"
         :collapse-signal="collapseAll"
+        wiki-url="https://wiki.guildwars2.com/wiki/Hero%27s_Choice_Chest"
       />
       <SimpleChecklist
         title="Dungeon Paths" icon="🏰"
         reset-label="Resets at 00:00 UTC"
         :all-ids="ALL_DUNGEON_IDS" :done-ids="donePaths" :name-map="DUNGEON_PATH_NAMES"
         :collapse-signal="collapseAll"
+        wiki-url="https://wiki.guildwars2.com/wiki/Dungeon"
       />
       <RaidChecklist
         v-if="raidWings.length > 0"
         title="Raids" reset-label="Resets Monday at 07:30 UTC"
         :wings="raidWings" :done-events="doneRaids"
         :collapse-signal="collapseAll"
+        wiki-url="https://wiki.guildwars2.com/wiki/Raid"
       />
     </template>
   </div>
@@ -139,6 +143,10 @@ function formatId(id: string): string {
   return id.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
 }
 
+function wikiLink(name: string): string {
+  return `https://wiki.guildwars2.com/wiki/${encodeURIComponent(name.replace(/ /g, '_'))}`
+}
+
 // ── SimpleChecklist sub-component ────────────────────────────────────────────
 
 const SimpleChecklist = defineComponent({
@@ -151,9 +159,10 @@ const SimpleChecklist = defineComponent({
     doneIds: { type: Array as () => string[], required: true },
     nameMap: { type: Object as () => Record<string, string>, required: true },
     collapseSignal: { type: Number, default: 0 },
+    wikiUrl: { type: String, default: '' },
   },
   setup(props) {
-    const expanded = ref(true)
+    const expanded = ref(false)
     watch(() => props.collapseSignal, () => { expanded.value = false })
 
     const doneSet = computed(() => new Set(props.doneIds))
@@ -170,29 +179,35 @@ const SimpleChecklist = defineComponent({
     )
 
     return () => {
-      const header = h(
-        'button',
-        {
-          class: 'w-full flex items-center justify-between gap-3 text-left group',
-          onClick: () => { expanded.value = !expanded.value },
-        },
-        [
-          h('div', { class: 'flex items-center gap-3' }, [
-            h('span', { class: 'text-xl' }, props.icon),
-            h('div', {}, [
-              h('h3', { class: 'font-semibold text-white group-hover:text-amber-300 transition-colors' }, props.title),
-              h('p', { class: 'text-xs text-slate-500' }, props.resetLabel),
-            ]),
+      const header = h('div', {
+        class: 'flex items-center justify-between gap-3 cursor-pointer group select-none',
+        onClick: () => { expanded.value = !expanded.value },
+      }, [
+        h('div', { class: 'flex items-center gap-3' }, [
+          h('span', { class: 'text-xl' }, props.icon),
+          h('div', {}, [
+            h('h3', { class: 'font-semibold text-white group-hover:text-amber-300 transition-colors' }, props.title),
+            h('p', { class: 'text-xs text-slate-500' }, props.resetLabel),
           ]),
-          h('div', { class: 'flex items-center gap-4 shrink-0' }, [
-            h('div', { class: 'text-sm font-semibold text-amber-400' }, `${done.value} / ${total.value} done`),
-            h('span', {
-              class: `text-slate-400 transition-transform duration-200 ${expanded.value ? 'rotate-180' : ''}`,
-              style: { display: 'inline-block' },
-            }, '▼'),
-          ]),
-        ]
-      )
+        ]),
+        h('div', { class: 'flex items-center gap-3 shrink-0' }, [
+          h('div', { class: 'text-sm font-semibold text-amber-400' }, `${done.value} / ${total.value} done`),
+          props.wikiUrl
+            ? h('a', {
+                href: props.wikiUrl,
+                target: '_blank',
+                rel: 'noopener',
+                onClick: (e: MouseEvent) => e.stopPropagation(),
+                class: 'text-xs text-amber-600 hover:text-amber-400 transition-colors',
+                title: 'View on GW2 Wiki',
+              }, '📖')
+            : null,
+          h('span', {
+            class: `text-slate-400 transition-transform duration-200 ${expanded.value ? 'rotate-180' : ''}`,
+            style: { display: 'inline-block' },
+          }, '▼'),
+        ]),
+      ])
 
       const body = expanded.value
         ? h('div', { class: 'mt-4 space-y-1' },
@@ -204,7 +219,14 @@ const SimpleChecklist = defineComponent({
                 class: `flex items-center gap-3 rounded-lg px-3 py-2 ${isDone ? 'bg-slate-700/20' : 'bg-slate-700/50'}`,
               }, [
                 h('span', { class: 'text-base shrink-0' }, isDone ? '✅' : '⬜'),
-                h('span', { class: `text-sm ${isDone ? 'text-slate-500 line-through' : 'text-white'}` }, name),
+                h('span', { class: `text-sm flex-1 ${isDone ? 'text-slate-500 line-through' : 'text-white'}` }, name),
+                h('a', {
+                  href: wikiLink(name),
+                  target: '_blank',
+                  rel: 'noopener',
+                  class: 'text-xs text-amber-600 hover:text-amber-400 transition-colors shrink-0',
+                  title: `View on GW2 Wiki`,
+                }, '↗'),
               ])
             })
           )
@@ -225,9 +247,10 @@ const RaidChecklist = defineComponent({
     wings: { type: Array as () => RaidWing[], required: true },
     doneEvents: { type: Array as () => string[], required: true },
     collapseSignal: { type: Number, default: 0 },
+    wikiUrl: { type: String, default: '' },
   },
   setup(props) {
-    const expanded = ref(true)
+    const expanded = ref(false)
     watch(() => props.collapseSignal, () => { expanded.value = false })
 
     const doneSet = computed(() => new Set(props.doneEvents))
@@ -235,29 +258,35 @@ const RaidChecklist = defineComponent({
     const done = computed(() => props.wings.reduce((s, w) => s + w.events.filter(e => doneSet.value.has(e.id)).length, 0))
 
     return () => {
-      const header = h(
-        'button',
-        {
-          class: 'w-full flex items-center justify-between gap-3 text-left group',
-          onClick: () => { expanded.value = !expanded.value },
-        },
-        [
-          h('div', { class: 'flex items-center gap-3' }, [
-            h('span', { class: 'text-xl' }, '⚔️'),
-            h('div', {}, [
-              h('h3', { class: 'font-semibold text-white group-hover:text-amber-300 transition-colors' }, props.title),
-              h('p', { class: 'text-xs text-slate-500' }, props.resetLabel),
-            ]),
+      const header = h('div', {
+        class: 'flex items-center justify-between gap-3 cursor-pointer group select-none',
+        onClick: () => { expanded.value = !expanded.value },
+      }, [
+        h('div', { class: 'flex items-center gap-3' }, [
+          h('span', { class: 'text-xl' }, '⚔️'),
+          h('div', {}, [
+            h('h3', { class: 'font-semibold text-white group-hover:text-amber-300 transition-colors' }, props.title),
+            h('p', { class: 'text-xs text-slate-500' }, props.resetLabel),
           ]),
-          h('div', { class: 'flex items-center gap-4 shrink-0' }, [
-            h('div', { class: 'text-sm font-semibold text-amber-400' }, `${done.value} / ${total.value} done`),
-            h('span', {
-              class: `text-slate-400 transition-transform duration-200 ${expanded.value ? 'rotate-180' : ''}`,
-              style: { display: 'inline-block' },
-            }, '▼'),
-          ]),
-        ]
-      )
+        ]),
+        h('div', { class: 'flex items-center gap-3 shrink-0' }, [
+          h('div', { class: 'text-sm font-semibold text-amber-400' }, `${done.value} / ${total.value} done`),
+          props.wikiUrl
+            ? h('a', {
+                href: props.wikiUrl,
+                target: '_blank',
+                rel: 'noopener',
+                onClick: (e: MouseEvent) => e.stopPropagation(),
+                class: 'text-xs text-amber-600 hover:text-amber-400 transition-colors',
+                title: 'View on GW2 Wiki',
+              }, '📖')
+            : null,
+          h('span', {
+            class: `text-slate-400 transition-transform duration-200 ${expanded.value ? 'rotate-180' : ''}`,
+            style: { display: 'inline-block' },
+          }, '▼'),
+        ]),
+      ])
 
       const body = expanded.value
         ? h('div', { class: 'mt-4 space-y-4' },
@@ -268,17 +297,27 @@ const RaidChecklist = defineComponent({
 
               return h('div', { key: wing.id }, [
                 h('div', { class: 'flex items-center justify-between mb-2' }, [
-                  h('span', { class: `text-sm font-medium ${allWingDone ? 'text-emerald-400' : 'text-white'}` }, wingName),
+                  h('a', {
+                    href: wikiLink(wingName),
+                    target: '_blank',
+                    rel: 'noopener',
+                    class: `text-sm font-medium transition-colors hover:text-amber-300 ${allWingDone ? 'text-emerald-400' : 'text-white'}`,
+                  }, wingName),
                   h('span', { class: 'text-xs text-slate-500' }, `${wingDone} / ${wing.events.length}`),
                 ]),
                 h('div', { class: 'flex flex-wrap gap-2' },
                   wing.events.map(event => {
                     const eventDone = doneSet.value.has(event.id)
                     const eventName = RAID_EVENT_NAMES[event.id] ?? formatId(event.id)
-                    return h('span', {
+                    return h('a', {
                       key: event.id,
-                      class: `text-xs px-2.5 py-1 rounded-lg flex items-center gap-1.5 ${
-                        eventDone ? 'bg-emerald-900/40 text-emerald-400' : 'bg-slate-700 text-slate-400'
+                      href: wikiLink(eventName),
+                      target: '_blank',
+                      rel: 'noopener',
+                      class: `text-xs px-2.5 py-1 rounded-lg flex items-center gap-1.5 transition-colors ${
+                        eventDone
+                          ? 'bg-emerald-900/40 text-emerald-400 hover:bg-emerald-900/60'
+                          : 'bg-slate-700 text-slate-400 hover:bg-slate-600 hover:text-slate-200'
                       }`,
                     }, [
                       h('span', {}, eventDone ? '✅' : '⬜'),
@@ -307,7 +346,7 @@ const VaultSection = defineComponent({
     collapseSignal: { type: Number, default: 0 },
   },
   setup(props) {
-    const expanded = ref(true)
+    const expanded = ref(false)
     watch(() => props.collapseSignal, () => { expanded.value = false })
 
     const done = computed(() =>

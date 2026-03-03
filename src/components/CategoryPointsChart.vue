@@ -6,14 +6,6 @@
         <span class="text-xs text-slate-400 font-normal">(top {{ displayCount }})</span>
       </h3>
       <div class="flex items-center gap-2 flex-wrap">
-        <button
-          @click="excludeFestivals = !excludeFestivals"
-          class="text-xs px-3 py-1.5 rounded-lg border transition-colors font-medium"
-          :class="excludeFestivals
-            ? 'border-amber-400 text-amber-400 bg-amber-400/10'
-            : 'border-slate-600 text-slate-400 hover:text-slate-200'"
-          title="Festival achievements are time-gated and only available during seasonal events"
-        >🎪 {{ excludeFestivals ? 'Festivals hidden' : 'Hide festivals' }}</button>
         <div class="flex rounded-lg overflow-hidden border border-slate-600 shrink-0 text-xs">
           <button
             @click="mode = 'potential'"
@@ -46,7 +38,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
+import { ref, computed } from 'vue'
 import { Bar } from 'vue-chartjs'
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Tooltip } from 'chart.js'
 import type { ChartEvent, ActiveElement } from 'chart.js'
@@ -61,47 +53,16 @@ const props = defineProps<{
 const emit = defineEmits<{ select: [catId: number] }>()
 
 const mode = ref<'potential' | 'earned'>('potential')
-const excludeFestivals = ref(localStorage.getItem('gw2_hide_festivals') === '1')
-watch(excludeFestivals, v => localStorage.setItem('gw2_hide_festivals', v ? '1' : '0'))
 const displayCount = 15
-
-const FESTIVAL_KEYWORDS = [
-  // Wintersday
-  'wintersday', "winter's presence", 'toymaker tixx',
-  // Halloween
-  'halloween', 'shadow of the mad king', 'blood and madness', 'lunatic wardrobe', 'mad king',
-  // Lunar New Year
-  'lunar new year', 'new year', 'dragon ball',
-  // Dragon Bash
-  'dragon bash',
-  // Festival of the Four Winds / Bazaar
-  'festival of the four winds', 'bazaar of the four winds', 'four winds customs',
-  'crown pavilion', "queen's gauntlet",
-  // Super Adventure Festival
-  'super adventure',
-  // Generic
-  'seasonal activities',
-]
-
-function isFestivalCategory(name: string): boolean {
-  const lower = name.toLowerCase()
-  return FESTIVAL_KEYWORDS.some(kw => lower.includes(kw))
-}
-
-const filteredStats = computed(() =>
-  excludeFestivals.value
-    ? props.categoryStats.filter(c => !isFestivalCategory(c.category.name))
-    : props.categoryStats
-)
 
 const topCategories = computed(() => {
   if (mode.value === 'potential') {
-    return [...filteredStats.value]
+    return [...props.categoryStats]
       .filter(c => c.totalPoints - c.earnedPoints > 0)
       .sort((a, b) => (b.totalPoints - b.earnedPoints) - (a.totalPoints - a.earnedPoints))
       .slice(0, displayCount)
   }
-  return [...filteredStats.value]
+  return [...props.categoryStats]
     .sort((a, b) => b.earnedPoints - a.earnedPoints)
     .slice(0, displayCount)
 })

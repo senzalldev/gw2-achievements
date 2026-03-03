@@ -7,14 +7,6 @@
       </h3>
       <div class="flex items-center gap-3">
         <button
-          @click="excludeFestivals = !excludeFestivals"
-          class="text-xs px-3 py-1 rounded-lg border transition-colors"
-          :class="excludeFestivals
-            ? 'border-amber-400 text-amber-400 bg-amber-400/10'
-            : 'border-slate-600 text-slate-400 hover:text-slate-200'"
-          title="Festival achievements are time-gated and only available during seasonal events"
-        >🎪 {{ excludeFestivals ? 'Festivals hidden' : 'Hide festivals' }}</button>
-        <button
           v-if="expanded.size > 0"
           @click="expanded = new Set()"
           class="text-xs text-slate-500 hover:text-slate-300 transition-colors"
@@ -195,7 +187,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
+import { ref, computed } from 'vue'
 import type { EnrichedAchievement } from '../composables/useAchievements'
 import type { AchievementBit } from '../types/gw2'
 
@@ -209,35 +201,9 @@ defineEmits<{ select: [item: EnrichedAchievement] }>()
 
 const expanded = ref(new Set<number>())
 const copyFeedback = ref<number | null>(null)
-const excludeFestivals = ref(localStorage.getItem('gw2_hide_festivals') === '1')
-watch(excludeFestivals, v => localStorage.setItem('gw2_hide_festivals', v ? '1' : '0'))
 
-const FESTIVAL_KEYWORDS = [
-  // Wintersday
-  'wintersday', "winter's presence", 'toymaker tixx',
-  // Halloween
-  'halloween', 'shadow of the mad king', 'blood and madness', 'lunatic wardrobe', 'mad king',
-  // Lunar New Year
-  'lunar new year', 'new year', 'dragon ball',
-  // Dragon Bash
-  'dragon bash',
-  // Festival of the Four Winds / Bazaar
-  'festival of the four winds', 'bazaar of the four winds', 'four winds customs',
-  'crown pavilion', "queen's gauntlet",
-  // Super Adventure Festival
-  'super adventure',
-  // Generic
-  'seasonal activities',
-]
-
-const visibleItems = computed(() =>
-  excludeFestivals.value
-    ? props.items.filter(a => {
-        const name = (a.category?.name ?? '').toLowerCase()
-        return !FESTIVAL_KEYWORDS.some(kw => name.includes(kw))
-      })
-    : props.items
-)
+// Items are pre-filtered by the global FilterBar — no local filtering needed
+const visibleItems = computed(() => props.items)
 
 function wikiUrl(name: string): string {
   return `https://wiki.guildwars2.com/wiki/${encodeURIComponent(name.replace(/ /g, '_'))}`

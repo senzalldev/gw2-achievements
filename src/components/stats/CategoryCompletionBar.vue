@@ -16,14 +16,11 @@ const props = defineProps<{
 }>()
 
 const topCats = computed(() => {
+  // Sort by most AP remaining — shows where the biggest opportunities are
   const sorted =
     props.mode === 'percent'
-      ? [...props.categoryStats].sort((a, b) => {
-          const aPct = a.totalPoints > 0 ? a.earnedPoints / a.totalPoints : 0
-          const bPct = b.totalPoints > 0 ? b.earnedPoints / b.totalPoints : 0
-          return bPct - aPct
-        })
-      : [...props.categoryStats].sort((a, b) => b.done - a.done)
+      ? [...props.categoryStats].sort((a, b) => (b.totalPoints - b.earnedPoints) - (a.totalPoints - a.earnedPoints))
+      : [...props.categoryStats].sort((a, b) => (b.done + b.inProgress) - (a.done + a.inProgress))
   return sorted.slice(0, 10)
 })
 

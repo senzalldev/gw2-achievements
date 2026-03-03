@@ -51,6 +51,28 @@
         </div>
       </div>
 
+      <!-- AP breakdown summary -->
+      <div class="flex flex-wrap gap-3 text-xs">
+        <div class="flex items-center gap-2 bg-slate-700/40 rounded-lg px-3 py-2 border border-slate-600/40">
+          <span class="w-2 h-2 rounded-full bg-purple-500 shrink-0"></span>
+          <span class="text-slate-400">Permanent</span>
+          <span class="font-semibold text-white">{{ stats.permanentAp.toLocaleString() }}</span>
+          <span class="text-slate-600">/ {{ stats.permanentMaxAp.toLocaleString() }}</span>
+        </div>
+        <div class="flex items-center gap-2 bg-slate-700/40 rounded-lg px-3 py-2 border border-slate-600/40">
+          <span class="w-2 h-2 rounded-full bg-amber-500 shrink-0"></span>
+          <span class="text-slate-400">Daily & Monthly</span>
+          <span class="font-semibold text-white">{{ stats.dailyMonthlyAp.toLocaleString() }}</span>
+          <span class="text-slate-600">/ 15,000</span>
+        </div>
+        <div class="flex items-center gap-2 bg-slate-700/40 rounded-lg px-3 py-2 border border-slate-600/40">
+          <span class="text-slate-400">Total</span>
+          <span class="font-semibold text-white">{{ stats.totalPoints.toLocaleString() }}</span>
+          <span class="text-slate-600">/ {{ stats.maxPoints.toLocaleString() }}</span>
+          <span v-if="!gameStatsReady" class="text-slate-600 italic">(loading…)</span>
+        </div>
+      </div>
+
       <!-- Stat highlights -->
       <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
         <div class="bg-slate-800 rounded-xl p-4 border border-slate-700/80">
@@ -71,7 +93,7 @@
           <div class="text-xl font-bold text-amber-400 truncate" :title="topCategory?.category.name">
             {{ topCategoryShortName }}
           </div>
-          <div class="text-xs text-slate-500 mt-0.5">{{ topCategoryPct }}% AP earned</div>
+          <div class="text-xs text-slate-500 mt-0.5">{{ topCategory?.earnedPoints.toLocaleString() }} AP earned</div>
         </div>
         <div class="bg-slate-800 rounded-xl p-4 border border-slate-700/80">
           <div class="text-xs text-slate-500 mb-1">Account Age</div>
@@ -90,7 +112,7 @@
             :achievements="achievements"
             :account-info="accountInfo"
             :mode="mode"
-            :total-available-ap="stats.maxPoints"
+            :permanent-max-ap="stats.permanentMaxAp"
           />
         </div>
 
@@ -130,7 +152,7 @@
     </div>
 
     <!-- AP Opportunity Finder (not captured in export) -->
-    <ApFinder :achievements="achievements" :done-ids="doneIds" />
+    <ApFinder :achievements="achievements" :never-started="neverStarted" :done-ids="doneIds" />
 
   </div>
 </template>
@@ -147,6 +169,7 @@ import ApFinder from './stats/ApFinder.vue'
 
 const props = defineProps<{
   achievements: EnrichedAchievement[]
+  neverStarted: EnrichedAchievement[]
   categoryStats: CategoryStats[]
   accountInfo: AccountInfo | null
   gameStatsReady?: boolean
@@ -158,6 +181,9 @@ const props = defineProps<{
     totalInGame: number
     totalPoints: number
     maxPoints: number
+    permanentAp: number
+    permanentMaxAp: number
+    dailyMonthlyAp: number
   }
 }>()
 
@@ -173,21 +199,12 @@ const apEfficiency = computed(() =>
   props.stats.maxPoints > 0 ? Math.round((props.stats.totalPoints / props.stats.maxPoints) * 100) : 0
 )
 
+// Best category = highest raw AP earned (most points put in your pocket)
 const topCategory = computed(() => {
   if (!props.categoryStats.length) return null
-  const sorted = [...props.categoryStats].sort((a, b) => {
-    const aPct = a.totalPoints > 0 ? a.earnedPoints / a.totalPoints : 0
-    const bPct = b.totalPoints > 0 ? b.earnedPoints / b.totalPoints : 0
-    return bPct - aPct
-  })
-  return sorted[0] ?? null
+  return [...props.categoryStats].sort((a, b) => b.earnedPoints - a.earnedPoints)[0] ?? null
 })
 
-const topCategoryPct = computed(() => {
-  const cat = topCategory.value
-  if (!cat) return 0
-  return cat.totalPoints > 0 ? Math.round((cat.earnedPoints / cat.totalPoints) * 100) : 0
-})
 
 const topCategoryShortName = computed(() => {
   const name = topCategory.value?.category.name ?? '—'

@@ -34,6 +34,9 @@
               <span v-if="item.category" class="text-xs bg-slate-600 text-amber-300 px-2 py-0.5 rounded-full shrink-0">
                 {{ item.category.name }}
               </span>
+              <span class="text-xs px-1.5 py-0.5 rounded shrink-0" :class="modeClass(item.mode)">
+                {{ modeLabel(item.mode) }}
+              </span>
               <span v-if="item.detail.rewards?.some(r => r.type === 'Title')"
                     class="text-xs bg-amber-900/40 text-amber-300 px-2 py-0.5 rounded-full shrink-0">
                 🎖️ Title
@@ -188,7 +191,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import type { EnrichedAchievement } from '../composables/useAchievements'
+import type { EnrichedAchievement, AchievementMode } from '../composables/useAchievements'
 import type { AchievementBit } from '../types/gw2'
 
 const props = defineProps<{
@@ -201,6 +204,23 @@ defineEmits<{ select: [item: EnrichedAchievement] }>()
 
 const expanded = ref(new Set<number>())
 const copyFeedback = ref<number | null>(null)
+
+const MODE_LABELS: Record<AchievementMode, string> = {
+  pve: '⚔️ PvE',
+  pvp: '🏆 PvP',
+  wvw: '🗡️ WvW',
+  festival: '🎪 Festival',
+  hom: '🏛️ HoM',
+}
+const MODE_CLASSES: Record<AchievementMode, string> = {
+  pve:      'bg-slate-700/60 text-slate-400',
+  pvp:      'bg-amber-900/40 text-amber-400',
+  wvw:      'bg-red-900/40 text-red-400',
+  festival: 'bg-purple-900/40 text-purple-400',
+  hom:      'bg-sky-900/40 text-sky-400',
+}
+function modeLabel(mode: AchievementMode): string { return MODE_LABELS[mode] }
+function modeClass(mode: AchievementMode): string  { return MODE_CLASSES[mode] }
 
 function progressColor(pct: number): string {
   if (pct >= 80) return 'bg-emerald-400'

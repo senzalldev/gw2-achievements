@@ -279,7 +279,7 @@ const props = defineProps<{
 
 const raidWings = ref<RaidWing[]>([])
 const doneRaids = ref<string[]>([])
-const raidsExpanded = ref(true)
+const raidsExpanded = ref(false)
 
 const raidsTotal = computed(() => raidWings.value.reduce((s, w) => s + w.events.length, 0))
 const raidsDone = computed(() => doneRaids.value.length)

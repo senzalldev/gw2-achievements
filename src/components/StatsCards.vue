@@ -109,26 +109,30 @@ const props = defineProps<{
     totalPoints: number
     maxPoints: number
   }
+  // Real total AP across all modes — used for chest milestone tracker only,
+  // since AP chests are awarded from your actual overall AP not per-mode AP.
+  actualTotalPoints: number
 }>()
 
 const completionPct = computed(() =>
   props.stats.totalInGame > 0 ? Math.round((props.stats.done / props.stats.totalInGame) * 100) : 0
 )
 
-// First chest at 100 AP, then every 500 AP up to 60,000 = 121 total chests
+// Chest tracker always uses actual total AP (all modes) — chests are milestone rewards
+// from your real overall AP, not per-mode.
 const chestsClaimed = computed(() => {
-  const earned = props.stats.totalPoints
+  const earned = props.actualTotalPoints
   return earned >= 100 ? 1 + Math.min(120, Math.floor(earned / 500)) : 0
 })
 
 const nextChest = computed(() => {
-  const earned = props.stats.totalPoints
+  const earned = props.actualTotalPoints
   if (earned >= 60000) return null
   const target = earned < 100 ? 100 : (Math.floor(earned / 500) + 1) * 500
   return { target, remaining: target - earned }
 })
 
-const segmentProgress = computed(() => props.stats.totalPoints % 500)
+const segmentProgress = computed(() => props.actualTotalPoints % 500)
 
-const lifetimePct = computed(() => Math.min(100, (props.stats.totalPoints / 60000) * 100))
+const lifetimePct = computed(() => Math.min(100, (props.actualTotalPoints / 60000) * 100))
 </script>

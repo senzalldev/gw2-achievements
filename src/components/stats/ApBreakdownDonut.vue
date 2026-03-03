@@ -26,19 +26,22 @@ const props = defineProps<{
   achievements: EnrichedAchievement[]
   accountInfo: AccountInfo | null
   mode: 'percent' | 'count'
-  totalAvailableAp?: number
+  permanentMaxAp?: number
 }>()
 
-const earned = computed(() => props.achievements.reduce((s, a) => s + a.earnedPoints, 0))
-const dailyMonthly = computed(() => (props.accountInfo?.daily_ap ?? 0) + (props.accountInfo?.monthly_ap ?? 0))
-const remaining = computed(() => {
-  if (props.totalAvailableAp != null) {
-    return Math.max(0, props.totalAvailableAp - earned.value - dailyMonthly.value)
-  }
-  const maxFromAchievements = props.achievements.reduce((s, a) => s + a.totalPoints, 0)
-  return Math.max(0, maxFromAchievements - earned.value)
+const earnedPermanent = computed(() => props.achievements.reduce((s, a) => s + a.earnedPoints, 0))
+const earnedDailyMonthly = computed(() => (props.accountInfo?.daily_ap ?? 0) + (props.accountInfo?.monthly_ap ?? 0))
+
+const permMax = computed(() => {
+  if (props.permanentMaxAp != null) return props.permanentMaxAp
+  return props.achievements.reduce((s, a) => s + a.totalPoints, 0)
 })
-const grandTotal = computed(() => earned.value + dailyMonthly.value + remaining.value)
+
+const remainingPermanent = computed(() => Math.max(0, permMax.value - earnedPermanent.value))
+const remainingDailyMonthly = computed(() => Math.max(0, 15000 - earnedDailyMonthly.value))
+const grandTotal = computed(() =>
+  earnedPermanent.value + earnedDailyMonthly.value + remainingPermanent.value + remainingDailyMonthly.value
+)
 
 function fmt(n: number): string {
   if (props.mode === 'percent') {
@@ -48,12 +51,12 @@ function fmt(n: number): string {
 }
 
 const chartData = computed(() => ({
-  labels: ['Achievements', 'Daily/Monthly', 'Remaining'],
+  labels: ['Achievement AP', 'Daily & Monthly AP', 'Achievement AP remaining', 'Daily & Monthly remaining'],
   datasets: [
     {
-      data: [earned.value, dailyMonthly.value, remaining.value],
-      backgroundColor: ['#a855f7', '#f59e0b', '#1e293b'],
-      borderColor: ['#7c3aed', '#d97706', '#334155'],
+      data: [earnedPermanent.value, earnedDailyMonthly.value, remainingPermanent.value, remainingDailyMonthly.value],
+      backgroundColor: ['#a855f7', '#f59e0b', '#1e1a2e', '#1c1a10'],
+      borderColor: ['#7c3aed', '#d97706', '#2d2442', '#2a2510'],
       borderWidth: 2,
       hoverOffset: 6,
     },
@@ -80,8 +83,9 @@ const chartOptions = computed(() => ({
 }))
 
 const legend = computed(() => [
-  { label: 'Earned (achievements)', color: '#a855f7', value: fmt(earned.value) },
-  { label: 'Daily & Monthly AP', color: '#f59e0b', value: fmt(dailyMonthly.value) },
-  { label: 'Available to earn', color: '#475569', value: fmt(remaining.value) },
+  { label: 'Achievement AP earned', color: '#a855f7', value: fmt(earnedPermanent.value) },
+  { label: 'Daily & Monthly earned', color: '#f59e0b', value: fmt(earnedDailyMonthly.value) },
+  { label: 'Achievement AP remaining', color: '#2d2442', value: fmt(remainingPermanent.value) },
+  { label: 'Daily & Monthly remaining', color: '#2a2510', value: fmt(remainingDailyMonthly.value) },
 ])
 </script>

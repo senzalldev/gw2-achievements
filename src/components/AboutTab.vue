@@ -16,6 +16,24 @@
           <div class="text-xs text-slate-500 mt-1">Updated {{ LAST_UPDATED }}</div>
         </div>
       </div>
+      <div class="mt-4 p-3 bg-amber-900/20 border border-amber-700/30 rounded-lg">
+        <p class="text-sm text-amber-300 font-medium mb-1">🧪 Experimental Tracker</p>
+        <p class="text-xs text-amber-200/70 leading-relaxed mb-2">
+          This tracker is actively developed and still learning. Features may change, numbers may
+          occasionally surprise you, and new ideas are always in progress. We're building this
+          together — if something looks off or you have a suggestion, feedback is always welcome.
+        </p>
+        <div class="flex items-center gap-3 flex-wrap">
+          <a href="https://github.com/senzalldev/gw2-achievements/discussions" target="_blank" rel="noopener"
+             class="text-xs text-amber-400 hover:text-amber-300 transition-colors flex items-center gap-1">
+            💬 Join the Discussion ↗
+          </a>
+          <a href="https://github.com/senzalldev/gw2-achievements/issues" target="_blank" rel="noopener"
+             class="text-xs text-amber-400 hover:text-amber-300 transition-colors flex items-center gap-1">
+            🐛 Report an Issue ↗
+          </a>
+        </div>
+      </div>
     </div>
 
     <!-- What it does -->
@@ -97,12 +115,13 @@
         </li>
         <li class="flex items-start gap-2"><span class="text-amber-400 shrink-0 mt-0.5">•</span>
           <span><strong class="text-slate-300">Festival achievements</strong> are time-gated and only available
-          during seasonal events. Use the "Hide festivals" toggle in Most Valuable and the AP chart to
-          see year-round opportunities.</span>
+          during seasonal events. Use the <strong class="text-slate-300">Festivals</strong> toggle in the filter bar
+          to hide them across the whole app and focus on year-round opportunities.</span>
         </li>
         <li class="flex items-start gap-2"><span class="text-amber-400 shrink-0 mt-0.5">•</span>
-          <span><strong class="text-slate-300">Achievement groups</strong> ("Raids", "Fractals", etc.) have no
-          official "Festivals" group in the API — festival detection uses category name matching.</span>
+          <span><strong class="text-slate-300">PvP and WvW</strong> AP is tracked separately by ArenaNet — the
+          tracker correctly classifies these using achievement flags and group names so you can filter them
+          in or out globally. The Show/Hide toggles in the filter bar are saved to your browser.</span>
         </li>
         <li class="flex items-start gap-2"><span class="text-amber-400 shrink-0 mt-0.5">•</span>
           <span><strong class="text-slate-300">Data is live</strong> but not real-time — reload the page to
@@ -254,6 +273,9 @@
         </li>
         <li class="flex items-start gap-2"><span class="text-purple-400 shrink-0 mt-0.5">★</span>
           <span>After your data loads, the tracker quietly fetches details for <strong class="text-slate-300">every achievement in the game</strong> in the background — not just yours — so AP totals and the "Not Started" bucket reflect the real game-wide picture rather than only what you've touched.</span>
+        </li>
+        <li class="flex items-start gap-2"><span class="text-purple-400 shrink-0 mt-0.5">★</span>
+          <span>All achievement data comes directly from the <strong class="text-slate-300">official GW2 API</strong>, lovingly delivered by Quaggan developers working round the clock in Castora. Hooooo! 🐟 They're helping build this tracker as fast as their little fins will allow. Their only complaint is that ArenaNet still hasn't added a <code class="text-amber-400">/v2/account/fish</code> endpoint — but they're not giving up hope.</span>
         </li>
       </ul>
     </div>
