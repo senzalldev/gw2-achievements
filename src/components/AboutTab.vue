@@ -32,6 +32,10 @@
              class="text-xs text-amber-400 hover:text-amber-300 transition-colors flex items-center gap-1">
             🐛 Report an Issue ↗
           </a>
+          <a href="https://senzall.com/changelog" target="senzall" rel="noopener"
+             class="text-xs text-amber-400 hover:text-amber-300 transition-colors flex items-center gap-1">
+            📋 Changelog ↗
+          </a>
         </div>
       </div>
     </div>
@@ -63,6 +67,9 @@
         </li>
         <li class="flex items-start gap-2"><span class="text-amber-400 shrink-0 mt-0.5">•</span>
           <span><strong class="text-slate-300">Daily</strong> — Wizard's Vault objectives, world bosses, dungeon paths, map chests, and weekly raid clears</span>
+        </li>
+        <li class="flex items-start gap-2"><span class="text-amber-400 shrink-0 mt-0.5">•</span>
+          <span><strong class="text-slate-300">Content Filters</strong> — PvE / PvP / WvW / Festival toggle bar that filters achievements across every tab simultaneously, saved to your browser</span>
         </li>
       </ul>
     </div>
@@ -245,7 +252,7 @@
         </div>
       </div>
       <p class="text-xs text-slate-500 mt-4">
-        Deployed as a static site on <strong class="text-slate-400">GitHub Pages</strong> via GitHub Actions.
+        Deployed as a static site on <strong class="text-slate-400">Cloudflare Pages</strong>.
         No server required — every API call goes browser-to-ArenaNet directly.
       </p>
     </div>
@@ -345,6 +352,6 @@ const techStack = [
   { icon: '⚡', name: 'Vite',        role: 'Build tool & dev server' },
   { icon: '🎨', name: 'Tailwind CSS',role: 'Utility-first styling' },
   { icon: '📊', name: 'Chart.js',    role: 'Donut & bar charts' },
-  { icon: '🐙', name: 'GitHub Pages',role: 'Hosting & CI/CD' },
+  { icon: '☁️', name: 'Cloudflare Pages', role: 'Hosting & CI/CD' },
 ]
 </script>
