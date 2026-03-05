@@ -236,80 +236,28 @@ const doneIds = computed(() =>
   new Set(props.achievements.filter(a => a.account.done).map(a => a.account.id))
 )
 
-// html2canvas doesn't support oklch (used by Tailwind v4 / modern browsers).
-// Converts an oklch(L C H[ / A]) string to rgb/rgba so the canvas renderer can parse it.
-function oklchToRgb(str: string): string {
-  const m = str.match(
-    /oklch\(\s*([\d.]+%?)\s+([\d.]+)\s+([\d.nNaA]+)(?:\s*\/\s*([\d.]+%?))?\s*\)/i
-  )
-  if (!m) return str
-  const g1 = m[1]!, g2 = m[2]!, g3 = m[3]!
-  let l = parseFloat(g1); if (g1.includes('%')) l /= 100
-  const c = parseFloat(g2)
-  const h = (parseFloat(g3) || 0) * (Math.PI / 180)
-  const alpha = m[4] ? (m[4].includes('%') ? parseFloat(m[4]) / 100 : parseFloat(m[4])) : 1
-  const la = c * Math.cos(h), lb = c * Math.sin(h)
-  const l_ = l + 0.3963377774 * la + 0.2158037573 * lb
-  const m_ = l - 0.1055613458 * la - 0.0638541728 * lb
-  const s_ = l - 0.0894841775 * la - 1.2914855480 * lb
-  const cb = (x: number) => x * x * x
-  const rL = +4.0767416621 * cb(l_) - 3.3077115913 * cb(m_) + 0.2309699292 * cb(s_)
-  const gL = -1.2684380046 * cb(l_) + 2.6097574011 * cb(m_) - 0.3413193965 * cb(s_)
-  const bL = -0.0041960863 * cb(l_) - 0.7034186147 * cb(m_) + 1.7076147010 * cb(s_)
-  const lin = (x: number) =>
-    x <= 0.0031308 ? 12.92 * x : 1.055 * Math.pow(Math.max(0, x), 1 / 2.4) - 0.055
-  const r = Math.round(Math.min(255, Math.max(0, lin(rL) * 255)))
-  const g = Math.round(Math.min(255, Math.max(0, lin(gL) * 255)))
-  const b = Math.round(Math.min(255, Math.max(0, lin(bL) * 255)))
-  return alpha < 1 ? `rgba(${r},${g},${b},${alpha.toFixed(3)})` : `rgb(${r},${g},${b})`
-}
-
 async function exportPng() {
   if (!exportRef.value || exporting.value) return
   exporting.value = true
   try {
-    const { default: html2canvas } = await import('html2canvas')
-    const liveRoot = exportRef.value
-    const liveAll = [liveRoot, ...liveRoot.querySelectorAll<HTMLElement>('*')]
-    const COLOR_PROPS = [
-      'color', 'background-color',
-      'border-top-color', 'border-right-color', 'border-bottom-color', 'border-left-color',
-      'outline-color', 'fill', 'stroke',
-    ]
-    const canvas = await html2canvas(liveRoot, {
+    // html-to-image uses the browser's own SVG renderer — handles oklch, CSS variables,
+    // and modern CSS natively without a custom CSS parser.
+    const { toPng } = await import('html-to-image')
+    const name = (props.accountInfo?.name ?? 'account').replace(/\./g, '-')
+    const dataUrl = await toPng(exportRef.value, {
       backgroundColor: '#0f172a',
-      scale: 2,
-      logging: false,
-      useCORS: true,
-      onclone: (clonedDoc: Document, clonedEl: HTMLElement) => {
-        // 1. Replace oklch in raw <style> tag text (html2canvas parses CSS directly)
-        clonedDoc.querySelectorAll('style').forEach(s => {
-          if (s.textContent?.includes('oklch'))
-            s.textContent = s.textContent.replace(/oklch\([^)]+\)/g, oklchToRgb)
-        })
-        // 2. Inline browser-resolved colours on each element (handles getComputedStyle oklch)
-        const clonedAll = [clonedEl, ...clonedEl.querySelectorAll<HTMLElement>('*')]
-        liveAll.forEach((liveEl, i) => {
-          const clEl = clonedAll[i]
-          if (!clEl) return
-          const computed = window.getComputedStyle(liveEl)
-          COLOR_PROPS.forEach(prop => {
-            const val = computed.getPropertyValue(prop)
-            if (val.includes('oklch')) clEl.style.setProperty(prop, oklchToRgb(val), 'important')
-          })
-        })
-      },
+      pixelRatio: 2,
     })
     const link = document.createElement('a')
-    const name = (props.accountInfo?.name ?? 'account').replace(/\./g, '-')
     link.download = `gw2-stats-${name}.png`
-    link.href = canvas.toDataURL('image/png')
+    link.href = dataUrl
     link.style.display = 'none'
     document.body.appendChild(link)
     link.click()
     document.body.removeChild(link)
   } catch (e) {
     console.error('Export failed', e)
+    alert('PNG export failed — check the browser console for details.')
   } finally {
     exporting.value = false
   }

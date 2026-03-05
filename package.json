@@ -16,7 +16,7 @@
     "@tailwindcss/vite": "^4.2.1",
     "autoprefixer": "^10.4.27",
     "chart.js": "^4.5.1",
-    "html2canvas": "^1.4.1",
+    "html-to-image": "^1.11.13",
     "tailwindcss": "^4.2.1",
     "vue": "^3.5.25",
     "vue-chartjs": "^5.3.3"
