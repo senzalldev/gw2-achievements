@@ -327,7 +327,7 @@ import { ref, computed, onMounted } from 'vue'
 import { APP_VERSION } from './version'
 import { useAchievements } from './composables/useAchievements'
 import type { CategoryStats, EnrichedAchievement } from './composables/useAchievements'
-import { useContentFilter } from './composables/useContentFilter'
+import { useContentFilter, FESTIVAL_ALIASES } from './composables/useContentFilter'
 import type { SavedAccount } from './types/gw2'
 import ApiKeyInput from './components/ApiKeyInput.vue'
 import StatsCards from './components/StatsCards.vue'
@@ -353,15 +353,66 @@ const {
   loadData, reset,
 } = useAchievements()
 
-const { statsFilterFn, listFilterFn } = useContentFilter()
+const { includePvP, includeWvW, includeHoM, festivalsAllowed } = useContentFilter()
 
-// List filtering — includes festival chips (hides items from lists but not from totals)
-const filteredAchievements = computed(() => enrichedAchievements.value.filter(listFilterFn.value))
-const filteredNeverStarted = computed(() => neverStartedEnriched.value.filter(listFilterFn.value))
+function makeListFilter(pvp: boolean, wvw: boolean, hom: boolean, fests: Record<string, boolean>) {
+  return (a: EnrichedAchievement): boolean => {
+    if (a.mode === 'pvp'  && !pvp) return false
+    if (a.mode === 'wvw'  && !wvw) return false
+    if (a.mode === 'hom'  && !hom) return false
+    // Check festivalName on ALL achievements regardless of mode — some festival achievements
+    // have mode='pvp' (Pvp flag takes priority in classifyMode) but still belong to a festival.
+    if (a.festivalName) {
+      const canonical = FESTIVAL_ALIASES[a.festivalName] ?? a.festivalName
+      if (fests[canonical] === false) return false
+    }
+    return true
+  }
+}
+
+// List filtering — includes festival chips (hides items from lists but not from totals).
+// festivalsAllowed is a computed in useContentFilter.ts that reads each individual festival
+// ref explicitly — same proven pattern as includePvP/WvW/HoM. One .value read here.
+const filteredAchievements = computed(() => {
+  const pvp = includePvP.value
+  const wvw = includeWvW.value
+  const hom = includeHoM.value
+  const fests = festivalsAllowed.value
+  const fn = makeListFilter(pvp, wvw, hom, fests)
+  return enrichedAchievements.value.filter(fn)
+})
+const filteredNeverStarted = computed(() => {
+  const pvp = includePvP.value
+  const wvw = includeWvW.value
+  const hom = includeHoM.value
+  const fests = festivalsAllowed.value
+  const fn = makeListFilter(pvp, wvw, hom, fests)
+  return neverStartedEnriched.value.filter(fn)
+})
 
 // Stats filtering — PvP/WvW/HoM only; festivals don't touch totals
-const statsAchievements = computed(() => enrichedAchievements.value.filter(statsFilterFn.value))
-const statsNeverStarted = computed(() => neverStartedEnriched.value.filter(statsFilterFn.value))
+const statsAchievements = computed(() => {
+  const pvp = includePvP.value
+  const wvw = includeWvW.value
+  const hom = includeHoM.value
+  return enrichedAchievements.value.filter(a => {
+    if (a.mode === 'pvp' && !pvp) return false
+    if (a.mode === 'wvw' && !wvw) return false
+    if (a.mode === 'hom' && !hom) return false
+    return true
+  })
+})
+const statsNeverStarted = computed(() => {
+  const pvp = includePvP.value
+  const wvw = includeWvW.value
+  const hom = includeHoM.value
+  return neverStartedEnriched.value.filter(a => {
+    if (a.mode === 'pvp' && !pvp) return false
+    if (a.mode === 'wvw' && !wvw) return false
+    if (a.mode === 'hom' && !hom) return false
+    return true
+  })
+})
 const filteredAlmostDone = computed(() =>
   filteredAchievements.value
     .filter(a => !a.account.done && a.progressPercent >= 25)

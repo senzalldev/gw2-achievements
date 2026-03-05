@@ -52,7 +52,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{ select: [catId: number] }>()
 
-const mode = ref<'potential' | 'earned'>('potential')
+const mode = ref<'potential' | 'earned'>('earned')
 const displayCount = 15
 
 const topCategories = computed(() => {

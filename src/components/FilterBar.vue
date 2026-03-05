@@ -63,9 +63,9 @@
 </template>
 
 <script setup lang="ts">
-import { useContentFilter, FESTIVALS as RAW_FESTIVALS } from '../composables/useContentFilter'
+import { useContentFilter, FESTIVALS as RAW_FESTIVALS, FESTIVAL_REFS } from '../composables/useContentFilter'
 
-const { includePvP, includeWvW, includeHoM, festivalRefs, isFiltered, isModeFiltered } = useContentFilter()
+const { includePvP, includeWvW, includeHoM, isFiltered, isModeFiltered } = useContentFilter()
 
 // Add short display names for chips
 const FESTIVALS = RAW_FESTIVALS.map(f => ({
@@ -84,11 +84,11 @@ const FESTIVALS = RAW_FESTIVALS.map(f => ({
 }))
 
 function isFestivalHidden(name: string): boolean {
-  return festivalRefs[name]?.value === false
+  return FESTIVAL_REFS[name]?.value === false
 }
 
 function toggleFestival(name: string): void {
-  const r = festivalRefs[name]
+  const r = FESTIVAL_REFS[name]
   if (r) r.value = !r.value
 }
 
@@ -96,6 +96,6 @@ function reset() {
   includePvP.value = true
   includeWvW.value = true
   includeHoM.value = true
-  for (const r of Object.values(festivalRefs)) r.value = true
+  for (const r of Object.values(FESTIVAL_REFS)) r.value = true
 }
 </script>
