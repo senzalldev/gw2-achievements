@@ -159,6 +159,7 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
+import { toPng } from 'html-to-image'
 import type { AccountInfo } from '../types/gw2'
 import type { EnrichedAchievement, CategoryStats } from '../composables/useAchievements'
 import CategoryRadar from './stats/CategoryRadar.vue'
@@ -240,9 +241,6 @@ async function exportPng() {
   if (!exportRef.value || exporting.value) return
   exporting.value = true
   try {
-    // html-to-image uses the browser's own SVG renderer — handles oklch, CSS variables,
-    // and modern CSS natively without a custom CSS parser.
-    const { toPng } = await import('html-to-image')
     const name = (props.accountInfo?.name ?? 'account').replace(/\./g, '-')
     const dataUrl = await toPng(exportRef.value, {
       backgroundColor: '#0f172a',
